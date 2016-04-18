@@ -24,15 +24,15 @@ catch (Exception $exc){
 	exit(1);
 }
 
-$GLOBALS['syscfg'] = new cpConfig($cmdlne);
-$GLOBALS['syslog'] = new cpSysLogger($cmdlne->options['verbose']);
+$GLOBALS['syscfg'] = new Config($cmdlne);
+$GLOBALS['syslog'] = new SysLogger($cmdlne->options['verbose']);
 $GLOBALS['syscfg']->cpbdir=dirname(__FILE__);
 
 try {
-	$cpBuilderDirector = new BuilderDirector();
+	$BuilderDirector = new BuilderDirector();
 	$command = $cmdlne->command_name;
 	$command = $command == NULL ? 'rungen': $command;
-	$cpBuilderDirector->$command('');
+	$BuilderDirector->$command('');
 }
 catch (Exception $exc){
 	print($exc->getMessage()."\n");
