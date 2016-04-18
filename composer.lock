@@ -1,0 +1,75 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "419e892992040790b566ec1c7fadc2ea",
+    "content-hash": "99c39bcf62d2464eea96ee090495d9fb",
+    "packages": [
+        {
+            "name": "pear2/console_commandline",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear2/Console_CommandLine.git",
+                "reference": "4a356864f88cdac79bcb656e54d0563c2fc7997d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear2/Console_CommandLine/zipball/4a356864f88cdac79bcb656e54d0563c2fc7997d",
+                "reference": "4a356864f88cdac79bcb656e54d0563c2fc7997d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PEAR2\\Console\\CommandLine": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vasil Rangelov",
+                    "email": "boen.robot@gmail.com",
+                    "role": "helper"
+                },
+                {
+                    "name": "David Jean Louis",
+                    "email": "izi@php.net",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Brett Bieber",
+                    "email": "saltybeagle@php.net",
+                    "role": "helper"
+                }
+            ],
+            "description": "Full featured package for managing command-line applications.",
+            "homepage": "http://pear2.php.net/PEAR2_Console_CommandLine",
+            "keywords": [
+                "arguments",
+                "cli",
+                "commandline",
+                "console",
+                "parser",
+                "pear2"
+            ],
+            "time": "2014-06-22 20:29:54"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

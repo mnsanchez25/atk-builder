@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<command>
+    <description>atk Framework code generator</description>
+    <version>1.0.0</version>
+    
+    <option name="verbose">
+        <short_name>-v</short_name>
+        <long_name>--verbose</long_name>
+        <description>Turn on verbose output.Repeat the command to increase verbosity level i.e. -v -v or -vv, up to level four i.e. -vvvv</description>
+        <action>Counter</action>
+    </option>
+    
+    <command>
+    	<name>delapp</name>
+    	<description>Deletes a created application</description>
+    	<argument name='appnme'>
+    		<description>The application to be deleted</description>
+    	</argument>
+    	<option name="basedir">
+	        <short_name>-b</short_name>
+	        <long_name>--base-dir</long_name>
+	        <description>Folder in which the application to be deleted resides in.</description>
+	        <default>./</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbname">
+	        <short_name>-d</short_name>
+	        <long_name>--db-name</long_name>
+	        <description>Database name.</description>	    
+        	<action>StoreString</action>
+        </option>
+         <option name="dbhost">
+	        <short_name>-h</short_name>
+	        <long_name>--db-host</long_name>
+	        <description>Database host.</description>
+	        <default>localhost</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbuser">
+	        <short_name>-u</short_name>
+	        <long_name>--db-user</long_name>
+	        <description>Database user with administrative privileges.</description>
+	        <default>root</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbpass">
+	        <short_name>-p</short_name>
+	        <long_name>--db-passwd</long_name>
+	        <description>Database password.</description>	    
+        	<action>Password</action>
+        </option>
+    </command>
+    <command>
+    	<name>newapp</name>
+    	<description>Create a new atk Application.</description>
+    	<argument name='appnme'>
+    		<description>The new application name</description>
+    	</argument>
+    	<option name="basedir">
+	        <short_name>-b</short_name>
+	        <long_name>--base-dir</long_name>
+	        <description>Folder for the generated app.</description>
+	        <default>./</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbname">
+	        <short_name>-d</short_name>
+	        <long_name>--db-name</long_name>
+	        <description>Database name.</description>	    
+        	<action>StoreString</action>
+        </option>
+         <option name="dbhost">
+	        <short_name>-h</short_name>
+	        <long_name>--db-host</long_name>
+	        <description>Database host.</description>
+	        <default>localhost</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbuser">
+	        <short_name>-u</short_name>
+	        <long_name>--db-user</long_name>
+	        <description>Database user with administrative privileges.</description>
+	        <default>root</default>	    
+        	<action>StoreString</action>
+        </option>
+        <option name="dbpass">
+	        <short_name>-p</short_name>
+	        <long_name>--db-passwd</long_name>
+	        <description>Database password.</description>	    
+        	<action>Password</action>
+        </option>
+    </command>
+    <command>
+    	<name>rungen</name>
+    	<description>
+    		Run the code generator to generate or re generate the application.This is the default action.</description>
+			<option name="deffile">
+			    <short_name>-f</short_name>
+			    <long_name>--def-file</long_name>
+			    <description>Definition file to be used to generate the app</description>
+			    <default>./DefFile</default>	    
+			   	<action>StoreString</action>
+			</option>
+			<option name="basedir">
+	        <short_name>-b</short_name>
+	        <long_name>--base-dir</long_name>
+	        <description>Folder for the generated app.</description>
+	        <default>./</default>	    
+        	<action>StoreString</action>
+        </option>			
+    </command>
+    <command>
+    	<name>dumpdd</name>
+    	<description>
+    		Dumps the data dictionary for verification</description>
+			<option name="deffile">
+			    <short_name>-f</short_name>
+			    <long_name>--def-file</long_name>
+			    <description>Definition file to be used to generate the app</description>	    
+			   	<action>StoreString</action>
+			</option>
+			 		
+    </command>
+</command>
