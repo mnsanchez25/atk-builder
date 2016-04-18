@@ -1,10 +1,6 @@
 <?php
 require_once 'vendor/autoload.php';
 
-
-namespace atk-builder {
-	
-
 use PEAR2\Console\CommandLine;
 
 $xmlfile = dirname(__FILE__) . 
