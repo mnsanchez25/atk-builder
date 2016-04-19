@@ -1,17 +1,19 @@
 <?php
-class cpFsManager
+namespace atkbuilder;
+
+class FsManager
 {
 	public static  function ensureFolderExists($folder,$auth=0774)
 	{
 		if (trim($folder)=="")
 			throw new Exception("Empty folder name received by ensureFolderExists");
 			
-		$folder = cpFsManager::normalizePath($folder);
+		$folder = FsManager::normalizePath($folder);
 		if(!file_exists($folder))
 		{
       mkdir($folder,true);
       chmod($folder,$auth);
-      cpFsManager::chown($folder,"www-data:www-data");
+      FsManager::chown($folder,"www-data:www-data");
       return false;
 		}
 		return true;
@@ -19,14 +21,14 @@ class cpFsManager
 	
 	public static function mkdir($folder)
 	{
-		$folder = cpFsManager::normalizePath($folder);
+		$folder = FsManager::normalizePath($folder);
 		$mkdir = "mkdir -p \"$folder\"";
 		system($mkdir);		
 	}
 	
 	public static function rmdir($folder)
 	{
-		$folder = cpFsManager::normalizePath($folder);
+		$folder = FsManager::normalizePath($folder);
 		$mkdir = "rm -rf \"$folder\"";
 		system($mkdir);		
 	}
@@ -34,14 +36,14 @@ class cpFsManager
 	
 	public static function assertFileNotExists($file)
 	{
-		$file = cpFsManager::normalizePath($file);
+		$file = FsManager::normalizePath($file);
 		if (file_exists($file))
 			throw new Exception("File or directory allready exists:".$file);
 	}
 	
 	public static function assertFileExists($file)
 	{
-		$file = cpFsManager::normalizePath($file);
+		$file = FsManager::normalizePath($file);
 		if (!file_exists($file))
 			throw new Exception("File or directory does not exists:".$file);
 	}
@@ -53,8 +55,8 @@ class cpFsManager
 	
 	public static function copy($from, $to)
 	{
-		$from = cpFsManager::normalizePath($from);
-		$to = cpFsManager::normalizePath($to);
+		$from = FsManager::normalizePath($from);
+		$to = FsManager::normalizePath($to);
 		$GLOBALS['syslog']->debug("Copying from:".$from." to:".$to,1);
 		$copy = " cp -R \"$from\" \"$to\"";
 		$GLOBALS['syslog']->debug($copy,2);
@@ -63,7 +65,7 @@ class cpFsManager
 	
 	public static function chmod($from, $auth)
 	{
-		$from = cpFsManager::normalizePath($from);
+		$from = FsManager::normalizePath($from);
 		
 		$GLOBALS['syslog']->debug("Chmod -R".$auth." ".$from." from:".$from,1);
 		$chmod = " chmod -R ${auth} \"$from\" ";
@@ -78,7 +80,7 @@ class cpFsManager
 	
   public static function chown($from, $own)
 	{
-		$from = cpFsManager::normalizePath($from);
+		$from = FsManager::normalizePath($from);
 		
 		$GLOBALS['syslog']->debug("Chown -R ".$own." ".$from." from:".$from,1);
 		$chown = " chown -R ${own} \"$from\" ";
@@ -88,19 +90,19 @@ class cpFsManager
 
 	public static function filePutContents($file, $contents)
 	{
-		$file = cpFsManager::normalizePath($file);
+		$file = FsManager::normalizePath($file);
 		file_put_contents($file, $contents);
 	}
 	
 	public static function fileGetContents($file)
 	{
-		$file = cpFsManager::normalizePath($file);
+		$file = FsManager::normalizePath($file);
 		return file_get_contents($file);
 	}
 	
 	public static function fileExists($file)
 	{
-		$file = cpFsManager::normalizePath($file);
+		$file = FsManager::normalizePath($file);
 		return file_exists($file);
 	}
 }

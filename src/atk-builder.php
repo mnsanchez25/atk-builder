@@ -1,7 +1,14 @@
 <?php
+
 require_once 'vendor/autoload.php';
 
 use PEAR2\Console\CommandLine;
+use atkbuilder\Config;
+use atkbuilder\BuilderDirector;
+use atkbuilder\SysLogger;
+
+error_reporting(E_ERROR | 	 E_PARSE);
+
 
 $xmlfile = dirname(__FILE__) . 
 			DIRECTORY_SEPARATOR .

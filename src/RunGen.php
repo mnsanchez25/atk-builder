@@ -1,16 +1,15 @@
 <?php
 
-require_once 'CodePoint/cpAbstractCodeCreator.php';
-require_once 'CodePoint/cpDbManager.php';
+namespace atkbuilder;
 
-class cpRunGen extends cpAbstractCodeCreator
+class RunGen extends AbstractCodeCreator
 {
-	public function __construct($basedir, cpDataDictionary $dd)
+	public function __construct($basedir, DataDictionary $dd)
 	{
 		$GLOBALS['syslog']->enter();
 		$this->data_dict=$dd;
 		$this->dd=$dd->dd;
-		$this->parent_node="cpNode";
+		$this->parent_node="Node";
 		$this->basedir=$basedir;	
 		$this->modules_dir=$this->basedir."/modules";	
 		$GLOBALS['syslog']->finish();
@@ -19,7 +18,7 @@ class cpRunGen extends cpAbstractCodeCreator
 	public function build()
 	{
 		$GLOBALS['syslog']->enter();
-		cpFsManager::ensureFolderExists($this->modules_dir);
+		FsManager::ensureFolderExists($this->modules_dir);
 		foreach ($this->dd['modules'] as $module_name => $module_def) 
 			$this->processModule($module_name, $module_def);
 		$this->modules_build_config_modules_base();
@@ -32,17 +31,17 @@ class cpRunGen extends cpAbstractCodeCreator
 		$module_name=trim($module_name);
 		$GLOBALS['syslog']->debug("Processing Module: ".$module_name, 1);
 		$module_dir=$this->modules_dir.'/'.$module_name;	
-		cpFsManager::ensureFolderExists($module_dir);
+		FsManager::ensureFolderExists($module_dir);
 		//Build module structure
 		$folders=array('install', 'languages', 'themes');
 		foreach ($folders as $folder) 
-			cpFsManager::ensureFolderExists($module_dir.'/'.$folder);
+			FsManager::ensureFolderExists($module_dir.'/'.$folder);
 		//Build nodes
 		foreach ($this->dd['modules'][$module_name]['nodes'] as $node_name => $node_contents)
 			$this->processNode($module_dir,$node_name,$node_contents);
 		//Build module inc 	
 		$module_inc_custom_file=$module_dir.'/'."module.inc";
-		if(!cpFsManager::fileExists($module_inc_custom_file))
+		if(!FsManager::fileExists($module_inc_custom_file))
 			$this->buildModuleCustomFile($module_name, $mod_dir, $module_def, $module_inc_custom_file);
 			
 		
@@ -100,7 +99,7 @@ class cpRunGen extends cpAbstractCodeCreator
 		$this->createFromTemplate('templates/install_inc',$record, $install_file);
 
 		$after_file=$install_dir."/after_install.inc";
-  	    if(!cpFsManager::fileExists($after_file))
+  	    if(!FsManager::fileExists($after_file))
 		{
 		  $this->createFromTemplate('templates/blank_php_file',$record, $after_file);
 		}
@@ -133,7 +132,7 @@ class cpRunGen extends cpAbstractCodeCreator
 			$GLOBALS['syslog']->log("Patch file generation disabled, please fill db data in def:".$node,0);
 			return $record;
 		}	
-		$db = new cpDbManager($this->dd);	
+		$db = new DbManager($this->dd);	
 		$tables = $db->tablesForPrefix($module_name);
 		//... Node/table in Model but not in Db => New node to install
 		foreach ($module_contents['nodes'] as $node => $node_def)
@@ -187,7 +186,7 @@ class cpRunGen extends cpAbstractCodeCreator
 			//Columns in table but no Attributes in model => Columns to Drop
 			foreach ($metadata as $col => $col_def) 
 			{
-				//Don't check automatic fields present in cpNode
+				//Don't check automatic fields present in Node
 				if (array_search($col, array("id", "system_reserved", "created_at", "created_by", "updated_at", "updated_by")) === false)
 				{
 					if (!isset($module_contents['nodes'][$node]['attributes'][$col] ))
@@ -207,7 +206,7 @@ class cpRunGen extends cpAbstractCodeCreator
 	{
 		$GLOBALS['syslog']->enter();
 		$signature_file=$lang_file=$module_dir."/module.sgn";
-		cpFsManager::filePutContents($signature_file, trim($vs['version']).':'.$vs['signature']);
+		FsManager::filePutContents($signature_file, trim($vs['version']).':'.$vs['signature']);
 		$GLOBALS['syslog']->finish();
 	}
 	
@@ -218,9 +217,9 @@ class cpRunGen extends cpAbstractCodeCreator
 		//To change to a upper version number
 		$signature= md5(var_export($module_contents['attrs'],true));
 		$signature_file=$lang_file=$module_dir."/module.sgn";
-		if(!cpFsManager::fileExists($signature_file))
+		if(!FsManager::fileExists($signature_file))
 		{
-			cpFsManager::filePutContents($signature_file, '1:'.$signature);
+			FsManager::filePutContents($signature_file, '1:'.$signature);
 			return array('version' => 1, 'signature' => $signature);
 		}
 		$sgn_file_contents=file_get_contents($signature_file);
@@ -245,10 +244,10 @@ class cpRunGen extends cpAbstractCodeCreator
 			foreach($module_contents['languages'] as  $entry)
 				$record['lsttrl'] .= "\t\t".$entry."\n";				
 			$lang_custom_file=$module_dir."/languages/".$lng."_custom.lng";
-			if(!cpFsManager::fileExists($lang_custom_file))
+			if(!FsManager::fileExists($lang_custom_file))
 				$this->createFromTemplate('/templates/blank_file', $record, $lang_custom_file);
 			
-			$lang_custom_file_contents= cpFsManager::fileGetContents($lang_custom_file);
+			$lang_custom_file_contents= FsManager::fileGetContents($lang_custom_file);
 			$record['custrl'] = $lang_custom_file_contents;
 			$this->createFromTemplate('/templates/language_file', $record, $lang_file_base);
 		}
@@ -306,7 +305,7 @@ class cpRunGen extends cpAbstractCodeCreator
 		
 		$node_custom_file=$module_dir."/class.".$node_name.".inc";
 		
-		if(!cpFsManager::fileExists($node_custom_file))
+		if(!FsManager::fileExists($node_custom_file))
 			$this->buildNodeCustom($node_name, $node_contents, $node_custom_file);
 
 		$node_base_file=$module_dir."/class.".$node_name."_base.inc";

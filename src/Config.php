@@ -1,9 +1,14 @@
 <?php
+
+namespace atkbuilder;
+
+use PEAR2\Console\CommandLine\Exception;
+
 class Config 
 {
 	private $config;
 	
-	function cpConfig($cmdlne)
+	function __construct($cmdlne)
 	{
 		$this->config['cwd']=getcwd();
 		$this->config['basedir']=getcwd();

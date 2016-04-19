@@ -1,5 +1,7 @@
 <?php 
 
+namespace atkbuilder;
+
 if (!defined('MYSQLI_READ_DEFAULT_GROUP'))
 {
 /**OC
@@ -538,7 +540,7 @@ define ('MYSQLI_REPORT_ALL', 255);
 define ('MYSQLI_REPORT_OFF', 0);
 }
 
-class cpDbManager
+class DbManager
 {
 	public function __construct($dd)
 	{

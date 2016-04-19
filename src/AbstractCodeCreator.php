@@ -1,7 +1,10 @@
 <?php
-require_once 'CodePoint/cpFsManager.php';
 
-abstract class cpAbstractCodeCreator
+namespace atkbuilder;
+
+use PEAR2\Console\CommandLine\Exception;
+
+abstract class AbstractCodeCreator
 {
 	
 	protected  function createFromTemplate($resource, $record, $destination)
@@ -11,7 +14,7 @@ abstract class cpAbstractCodeCreator
 		$GLOBALS['syslog']->debug("Record:".var_export($record, true),4);
 		$contents = $this->getResource($resource);
 		$contents = $this->interpolate($record, $contents);
-		cpFsManager::filePutContents($destination,$contents);
+		FsManager::filePutContents($destination,$contents);
 		$GLOBALS['syslog']->debug("Code generated for:".$destination."\n".$contents,4);
 		$GLOBALS['syslog']->finish();
 	}
@@ -28,7 +31,7 @@ abstract class cpAbstractCodeCreator
     
     protected  function getResource($resource)
     {
-    	return cpFsManager::fileGetContents($GLOBALS['syscfg']->cpbdir."/resources/".$resource);
+    	return FsManager::fileGetContents($GLOBALS['syscfg']->cpbdir."/resources/".$resource);
 	}
 	
 
@@ -36,7 +39,7 @@ abstract class cpAbstractCodeCreator
 	{
 		$conn = mysql_connect($this->dbhost, $this->dbuser,$this->dbpass);
 		if (!$conn)
-			throw new Exception("Could not connect to database server with the supplied parameters");
+			throw new Exception("Could not connect to database server with the supplied parameters. (User:".$this->dbuser." ,Pass:".$this->dbpass.")");
 		$dbname = $this->dbname;
 		$result = mysql_query($query);
 		$GLOBALS['syslog']->debug("ExecSql:".$query,1);

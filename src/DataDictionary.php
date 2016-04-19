@@ -4,6 +4,8 @@
  *
  */	
 
+namespace atkbuilder;
+
 
 define('TA_TAG'			,0);
 define('TA_ID'			,1);
@@ -46,7 +48,7 @@ define('TADB_CHARSET'		,6);
 
 
 
-class cpDataDictionary
+class DataDictionary
 {
 	var $dd = array();
 	
@@ -142,7 +144,7 @@ class cpDataDictionary
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['id']=$this->cur_nod;							
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['description']=trim($tags[TANOD_DESCRIPTION]==''?$tags[TA_ID]:$tags[TANOD_DESCRIPTION]);
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['flags']=trim($tags[TANOD_FLAGS]=='' ?'NF_ADD_LINK':$tags[TANOD_FLAGS]);
-				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['type']=trim($tags[TANOD_NODETYPE])==''? 'cpNode':trim($tags[TANOD_NODETYPE]);
+				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['type']=trim($tags[TANOD_NODETYPE])==''? 'Node':trim($tags[TANOD_NODETYPE]);
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['search']=(($tags[TANOD_SEARCHABLE] == '') || (strtolower($tags[TANOD_SEARCHABLE]) == 'false')) ? false : true;
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['install']=$tags[TANOD_INSTALLABLE] == '' ? true : false;
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['actions']=trim($tags[TANOD_ACTIONS])=='' ? array('admin', 'add', 'edit', 'delete', 'view'): explode(",", $tags[TANOD_ACTIONS]);

@@ -1,20 +1,23 @@
 <?php
 
-require_once 'CodePoint/cpAbstractCodeCreator.php';
+namespace atkbuilder;
 
-class cpNewApp extends cpAbstractCodeCreator
+
+use PEAR2\Console\CommandLine\Exception;
+
+class NewApp extends AbstractCodeCreator
 {
 	public function __construct($basedir, $appnme)
 	{
 		$GLOBALS['syslog']->enter();
 		$this->basedir=$basedir;		
 		$this->appnme=$appnme;
-		$this->full_basedir = cpFsManager::normalizePath($this->basedir.$appnme);
-		$this->dbname = trim($def_file = $GLOBALS['syscfg']->cmdlne->command->options['dbname']);
-		$this->dbname =  trim($this->dbname) == "" ? $this->appnme:$this->dbname;
-		$this->dbhost = trim($def_file = $GLOBALS['syscfg']->cmdlne->command->options['dbhost']);
-		$this->dbuser = trim($def_file = $GLOBALS['syscfg']->cmdlne->command->options['dbuser']);
-		$this->dbpass = trim($def_file = $GLOBALS['syscfg']->cmdlne->command->options['dbpass']);
+		$this->full_basedir = FsManager::normalizePath($this->basedir.$appnme);
+		$this->dbname = trim($GLOBALS['syscfg']->cmdlne->command->options['dbname']);
+		$this->dbname = trim($this->dbname) == "" ? $this->appnme:$this->dbname;
+		$this->dbhost = trim($GLOBALS['syscfg']->cmdlne->command->options['dbhost']);
+		$this->dbuser = trim($GLOBALS['syscfg']->cmdlne->command->options['dbuser']);
+		$this->dbpass = trim($GLOBALS['syscfg']->cmdlne->command->options['dbpass']);
 		
 		$GLOBALS['syslog']->finish();
 	}
@@ -27,14 +30,14 @@ class cpNewApp extends cpAbstractCodeCreator
 	{
 		$GLOBALS['syslog']->enter();
 		try{ 
-			cpFsManager::assertFileExists($this->basedir);
-			cpFsManager::assertFileNotExists($this->full_basedir);
+			FsManager::assertFileExists($this->basedir);
+			FsManager::assertFileNotExists($this->full_basedir);
 		} catch(Exception $e){
 			throw new Exception($e->getMessage());
 		}
 		//if ($this->dbpass == null)
 		//	throw new Exception("This option requires a database user and password provide it with -u and -p. -u defaults to root");
-		cpFsManager::ensureFolderExists($this->basedir);
+		FsManager::ensureFolderExists($this->basedir);
 		$this->assertDatabaseNew();
 		$this->extractFramework();
 		$this->createDefFile();
@@ -82,10 +85,9 @@ class cpNewApp extends cpAbstractCodeCreator
 	private function extractFramework()
 	{	
 		$GLOBALS['syslog']->enter();	
-		$source_root = $GLOBALS['syscfg']->cpbdir."/resources/craddle-1.0.0";
 		$dest=$this->full_basedir;				
-		cpFsManager::copy($source_root, $dest);
-		cpFsManager::chmod($dest, "774");
+		$repository = new \CarrLabs\GitWrapper\GitRepository("https://github.com/Sintattica/atk-skeleton.git");
+		$repository->cloneTo(($dest));
 		$GLOBALS['syslog']->finish();		
 	}	
 }

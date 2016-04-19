@@ -1,5 +1,7 @@
 <?php
-define("CPLOG_DEBUG" 	,		4);
+namespace atkbuilder;
+
+define("LOG_DEBUG" 	,		4);
 
 class SysLogger
 {
@@ -16,7 +18,7 @@ class SysLogger
 	public function log($message="", $level=0)
 	{
 		$prefix="";
-		if ($level >= CPLOG_DEBUG)
+		if ($level >= LOG_DEBUG)
 		{
 			$bt = debug_backtrace();
 			$prefix .= $prefix."[".$bt[1]['file']."#".$bt[1]['function']."@".$bt[0]['line']."] ";	
@@ -29,7 +31,7 @@ class SysLogger
 	public function debug($message="", $level=0)
 	{
 		$prefix="";
-		if ($level >= CPLOG_DEBUG)
+		if ($level >= LOG_DEBUG)
 		{
 			$bt = debug_backtrace();
 			$prefix .= $prefix."[".$bt[1]['file']."#".$bt[1]['function']."@".$bt[0]['line']."] ";	
@@ -43,7 +45,7 @@ class SysLogger
 		
 		$prefix="";
 		
-		if ($this->loglvl >= CPLOG_DEBUG)
+		if ($this->loglvl >= LOG_DEBUG)
 		{
 			$bt = debug_backtrace();
 			$file = basename(isset($bt[0]['file']) ? $bt[0]['file']:"?");
@@ -57,7 +59,7 @@ class SysLogger
 	public function finish($message="")
 	{
 		$prefix="";
-		if ($this->loglvl >= CPLOG_DEBUG)
+		if ($this->loglvl >= LOG_DEBUG)
 		{
 			$bt = debug_backtrace();
 			$file =basename(isset($bt[0]['file']) ? $bt[0]['file']:"?");

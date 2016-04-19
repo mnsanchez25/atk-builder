@@ -3,11 +3,9 @@
  * This file is part of atk code generator
  */
 
-use DataDictionary;
-use CodeBuilder; 
-use NewApp;
-use DelApp;
-use RunGen;
+
+namespace atkbuilder;
+
 
 class BuilderDirector 
 {

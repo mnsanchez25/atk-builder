@@ -4,6 +4,8 @@
  *
  */	
 
+namespace atkbuilder;
+
 class cpCodeBuilder 
 {
 	private $dd;
