@@ -1,0 +1,6 @@
+<?php
+${node_install}
+${table_drop}
+${col_add}
+${col_drop}
+?>

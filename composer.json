@@ -3,8 +3,7 @@
 		"src/atk-builder.php"
 	],
 	"require" : {
-		"pear2/console_commandline" : "^0.2.1",
-		"carrlabs/git-wrapper" : "@dev"
+		"pear2/console_commandline" : "^0.2.1"
 	},
 	"name" : "atk-builder",
 	"description" : "Code generator tool for the ATK Framework",

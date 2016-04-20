@@ -31,7 +31,9 @@ abstract class AbstractCodeCreator
     
     protected  function getResource($resource)
     {
-    	return FsManager::fileGetContents($GLOBALS['syscfg']->cpbdir."/resources/".$resource);
+    	$source=$GLOBALS['syscfg']->cpbdir."/resources/".$resource;
+		$GLOBALS['syslog']->debug("Reading resource from:".$source);
+    	return FsManager::fileGetContents($source);
 	}
 	
 

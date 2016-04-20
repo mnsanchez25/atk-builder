@@ -1,0 +1,15 @@
+<?php
+
+include_once("${modnme}_base.inc");
+ 
+class mod_${modnme} extends mod_${modnme}_base 
+{
+	function mod_${modnme}($name='')
+	{
+		$class_name =  get_class($this);
+		list($module_prefix,$this->module_name) = explode("mod_",$class_name);
+		$this->cpModule($this->module_name);
+	}
+}
+
+?>

@@ -12,7 +12,7 @@ class NewApp extends AbstractCodeCreator
 		$GLOBALS['syslog']->enter();
 		$this->basedir=$basedir;		
 		$this->appnme=$appnme;
-		$this->full_basedir = FsManager::normalizePath($this->basedir.$appnme);
+		$this->full_basedir = FsManager::normalizePath($this->basedir.DIRECTORY_SEPARATOR.$appnme);
 		$this->dbname = trim($GLOBALS['syscfg']->cmdlne->command->options['dbname']);
 		$this->dbname = trim($this->dbname) == "" ? $this->appnme:$this->dbname;
 		$this->dbhost = trim($GLOBALS['syscfg']->cmdlne->command->options['dbhost']);
@@ -41,7 +41,7 @@ class NewApp extends AbstractCodeCreator
 		$this->assertDatabaseNew();
 		$this->extractFramework();
 		$this->createDefFile();
-		$this->createConfigInc();
+		$this->createEnvFile();
 		$GLOBALS['syslog']->finish();	
 	}
 	
@@ -62,23 +62,25 @@ class NewApp extends AbstractCodeCreator
 	private function createDefFile()
 	{					
 		$GLOBALS['syslog']->enter();
+		$record = array();
 		$record["appnme"]=$this->appnme;
 		$record["dbnme"]=$this->appnme;
 		$record["dbusr"]=$this->appnme;
 		$record["dbpas"]=$this->appnme;			 
-		$this->createFromTemplate('templates/DefFile', $record, $this->full_basedir.'/DefFile');	
+		$this->createFromTemplate('templates'.DIRECTORY_SEPARATOR.'DefFile', $record, $this->full_basedir.DIRECTORY_SEPARATOR.'DefFile');	
 		$GLOBALS['syslog']->finish();						
 	}
 	
-	private function createConfigInc()
+	private function createEnvFile()
 	{					
 		$GLOBALS['syslog']->enter();
+		$record = array();
 		$record["appnme"]=$this->appnme;
 		$record["dbhost"]=$this->dbhost;
 		$record["dbnme"]=$this->appnme;
 		$record["dbusr"]=$this->appnme;
 		$record["dbpas"]=$this->appnme;			 
-		$this->createFromTemplate('templates/config.inc.php', $record, $this->full_basedir.'/config.inc.php');	
+		$this->createFromTemplate('templates'.DIRECTORY_SEPARATOR.'.env.example', $record, $this->full_basedir.DIRECTORY_SEPARATOR.'.env');	
 		$GLOBALS['syslog']->finish();						
 	}
 	
@@ -86,8 +88,8 @@ class NewApp extends AbstractCodeCreator
 	{	
 		$GLOBALS['syslog']->enter();	
 		$dest=$this->full_basedir;				
-		$repository = new \CarrLabs\GitWrapper\GitRepository("https://github.com/Sintattica/atk-skeleton.git");
-		$repository->cloneTo(($dest));
+		$command = "git clone https://github.com/Sintattica/atk-skeleton.git ".$dest;
+		system($command);
 		$GLOBALS['syslog']->finish();		
 	}	
 }

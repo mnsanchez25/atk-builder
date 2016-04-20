@@ -1,6 +1,5 @@
 <?php
-
-require_once 'vendor/autoload.php';
+require_once dirname(__FILE__). DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
 use PEAR2\Console\CommandLine;
 use atkbuilder\Config;
@@ -33,7 +32,7 @@ catch (Exception $exc){
 
 $GLOBALS['syscfg'] = new Config($cmdlne);
 $GLOBALS['syslog'] = new SysLogger($cmdlne->options['verbose']);
-$GLOBALS['syscfg']->cpbdir=dirname(__FILE__);
+$GLOBALS['syscfg']->cpbdir=dirname(__FILE__).DIRECTORY_SEPARATOR."..";
 
 try {
 	$BuilderDirector = new BuilderDirector();

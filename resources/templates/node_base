@@ -1,0 +1,13 @@
+<?php
+class ${ndenme}_base extends ${parnde}
+{
+	function ${ndenme}_base($name="${ndenme}")
+	{
+		$this->table_name="${ndenme}";
+		$this->${parnde}($name${ndefse}${ndeflg});
+		${attlst}
+		$this->setTable($this->m_module."_".$this->table_name);	
+	}
+}
+
+?>

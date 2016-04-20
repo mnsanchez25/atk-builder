@@ -1,0 +1,32 @@
+<?php
+	
+class mod_${modnme}_base extends cpModule
+{
+	var $module = "${modnme}";
+	
+	function getMenuItems()
+	{
+		$menu_label="${mnulbl}";
+		$enable = array(${enbarr});
+		
+		$this->menuitem($menu_label, "", "main", $enable);
+		
+		${mnulst}
+		
+		$this->menuitem("-","",$menu_label,  $enable);
+	}
+	
+	function getNodes()
+	{
+		${genlst}
+	}
+	
+	function search($expression)
+	{
+		$results=array();
+		${sealst}
+		return $results;
+	}	
+}
+
+?>

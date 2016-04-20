@@ -1,0 +1,11 @@
+appnme:ctaspag
+
+
+module:personas:Trabajar con Personas
+	node:Persona:Maestro de Personas
+		nombre
+		fecha_nacimiento
+		personas__tipos_de_personas_id
+		
+	node:tipos_de_personas:Tipos de personas
+		descripcion

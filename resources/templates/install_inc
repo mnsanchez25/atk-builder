@@ -1,0 +1,6 @@
+<?php
+
+	${ndelst}
+	$setup->setVersion(${vernbr});
+  include("after_install.inc");
+?>
