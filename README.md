@@ -75,8 +75,7 @@ db:myappdb:root:pass
 
 module:payroll
 	node:employees:[label]:[actions]:[node_flags]:[show_in_menu]
-		name:[label]:[attribute_type]:[attribute_flags]:[tab]
-				
+		name:[label]:[attribute_type]:[attribute_flags]:[tab]		
 ```
 
 The items between square brackets are optional, if ommited, proper values will be infered for them based on context.
