@@ -106,4 +106,24 @@ atk-builder.phar
 Without arguments, that will trigger the **rungen** command wich will update everything, Modules, Nodes and tables,
 then you edit your **DefFile** again, add some Modules, Nodes or attributes or remove them as well, and run the generarion again.
 While you are at that, you can edit the non base classes to add validation and business logic.
-Wash, rinse and repeat until your app is goog enough for prime time.
+A common session will look like:
+
+```
+atk-builder.phar --newapp MyApp -u user -p password -b /path/for/my/new/app
+cd /path/for/my/new/app
+vim DefFile //Add some defs
+atk-builder.phar
+php -s 0.0.0.0:8000 -t web //Check them out
+vim DefFile //Add some more, update old defs
+atk-builder.phar //Update the system
+php -s 0.0.0.0:8000 -t web //Check it out
+vim src/Module/SomeNode.class //Add some business logic to a node
+php -s 0.0.0.0:8000 -t web //Test it
+vim DefFile //Add some more, update old defs
+atk-builder.phar //Update the system
+.
+.
+.
+```
+
+Wash, rinse and repeat until your app is good enough for prime time.
