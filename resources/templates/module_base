@@ -1,32 +1,27 @@
-<?php
-	
-class mod_${modnme}_base extends cpModule
+namespace App\Modules\${module_name};
+
+use Sintattica\Atk\Core\Atk;
+use Sintattica\Atk\Core\Tools;
+use Sintattica\Atk\Core\Menu;
+
+class Module extends \Sintattica\Atk\Core\Module
 {
-	var $module = "${modnme}";
-	
-	function getMenuItems()
-	{
-		$menu_label="${mnulbl}";
-		$enable = array(${enbarr});
-		
-		$this->menuitem($menu_label, "", "main", $enable);
-		
-		${mnulst}
-		
-		$this->menuitem("-","",$menu_label,  $enable);
-	}
-	
-	function getNodes()
-	{
-		${genlst}
-	}
-	
-	function search($expression)
-	{
-		$results=array();
-		${sealst}
-		return $results;
-	}	
+    static $module = '${module_name}';
+
+    public function boot()
+    {
+    	${register_nodes}
+    	
+    	${menu_items}
+    }
+    
+    public function search($expression)
+    {
+    	$results = array();
+    	
+    	${search_items}	
+    	
+    	return $results;
+    }
 }
 
-?>

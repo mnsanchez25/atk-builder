@@ -1,6 +1,8 @@
 <?php
 namespace atkbuilder;
 
+use PEAR2\Console\CommandLine\Exception;
+
 class FsManager
 {
 	public static  function ensureFolderExists($folder,$auth=0774)
@@ -11,10 +13,10 @@ class FsManager
 		$folder = FsManager::normalizePath($folder);
 		if(!file_exists($folder))
 		{
-      mkdir($folder,true);
-      chmod($folder,$auth);
-      FsManager::chown($folder,"www-data:www-data");
-      return false;
+      		mkdir($folder,true);
+      		chmod($folder,$auth);
+      		FsManager::chown($folder,"www-data:www-data");
+      		return false;
 		}
 		return true;
 	}
@@ -71,7 +73,7 @@ class FsManager
 		$chmod = " chmod -R ${auth} \"$from\" ";
 		$GLOBALS['syslog']->debug($chmod,2);
 		system($chmod);
-    $GLOBALS['syslog']->debug("Chown -R www-data:www-data $from from:".$from,1);
+    	$GLOBALS['syslog']->debug("Chown -R www-data:www-data $from from:".$from,1);
 		$chmod = " chown -R www-data:www-data \"$from\" ";
 		$GLOBALS['syslog']->debug($chmod,2);
 		system($chmod);
@@ -92,6 +94,7 @@ class FsManager
 	{
 		$file = FsManager::normalizePath($file);
 		file_put_contents($file, $contents);
+		chmod($file,0774);
 	}
 	
 	public static function fileGetContents($file)

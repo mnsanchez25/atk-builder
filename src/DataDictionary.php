@@ -58,6 +58,7 @@ class DataDictionary
 		$GLOBALS['syslog']->log("Reading definition file:".$def_file);
 		$this->loadDefFile($def_file);
 		$this->dd['lnglst']=array("es", "en");	
+		$this->dd['dirnme'] = dirname($def_file);
 	}
 	
 	/**
@@ -196,14 +197,14 @@ class DataDictionary
     		list($filler, $normalized) = explode("hasmany_", $field_name);
     		list($module,$node_id) = explode("__",$normalized);
     		$key=$this->cur_mod."__".$this->cur_nod."_id";
-       		return array("type"=>"atkOneToManyRelation", "params"=>"'".$module.".".$node_id."','".$key."',NULL");	
+       		return array("type"=>"OneToManyRelation", "params"=>"'".$module.".".$node_id."','".$key."',NULL");	
     	}    	
     	
         list($module,$node_id) = explode("__",$field_name);
         if (($module !="") and ($node_id!=""))
         {
         	list($node,$id) = explode("_id", $node_id);
-    		return array("type"=>"atkManyToOneRelation", "params"=>"'".$module.".".$node."', AF_RELATION_AUTOCOMPLETE|AF_RELATION_AUTOLINK", 'dbtype'=>'bigint');
+    		return array("type"=>"ManyToOneRelation", "params"=>"'".$module.".".$node."', AF_RELATION_AUTOCOMPLETE|AF_RELATION_AUTOLINK", 'dbtype'=>'bigint');
         }	
         $fdict=$this->getFieldDictionary();
     	foreach ($fdict as $entry)
@@ -217,7 +218,7 @@ class DataDictionary
  				}   			
     		}
     	}		
-  		$result=array("type" => "atkAttribute", "params"=>"", "dbtype"=>"VARCHAR(100)");  	
+  		$result=array("type" => "Attribute", "params"=>"", "dbtype"=>"VARCHAR(100)");  	
     	return $result;
     }
     
@@ -232,7 +233,7 @@ class DataDictionary
     						"descripcion",
     						"description"
     				),	
-    				"type" =>"atkAttribute",
+    				"type" =>"Attribute",
     				"params" =>"AF_OBLIGATORY|AF_SEARCHABLE, 50",
     				"dbtype" =>"VARCHAR(50)"
     				),
@@ -241,7 +242,7 @@ class DataDictionary
    							"date",
     						"fecha", 
   					),	
-    				"type" =>"atkDateAttribute",
+    				"type" =>"DateAttribute",
     				"params" =>"'d/m/Y', 'd/m/Y', NULL, NULL, AF_DATE_STRING",
     				"dbtype" =>"DATE"
     				),
@@ -253,7 +254,7 @@ class DataDictionary
     						"observacion", 
     						"observaciones" 
   					),	
-    				"type" =>"atkTextAttribute",
+    				"type" =>"TextAttribute",
     				"params" =>"AF_HIDE_LIST",
   					"dbtype" =>"TEXT"
     				),	
@@ -266,7 +267,7 @@ class DataDictionary
     						"number",
 							"numero" 
   					),	
-    				"type" =>"atkNumberAttribute",
+    				"type" =>"NumberAttribute",
     				"params" =>"",
     				"dbtype" =>"BIGINT"
     				),	
@@ -281,7 +282,7 @@ class DataDictionary
                 			"ammount",
                 			"price",
   					),	
-    				"type" =>"atkCurrencyAttribute",
+    				"type" =>"CurrencyAttribute",
     				"params" =>"",
   					"dbtype" =>"DEC(15, 2)"
     				),	
@@ -293,7 +294,7 @@ class DataDictionary
     						"time",
     						"tiempo" 
   					),	
-    				"type" =>"atkTimeAttribute",
+    				"type" =>"TimeAttribute",
     				"params" =>"",
   					"dbtype" =>"TIME"
     				),	
@@ -307,7 +308,7 @@ class DataDictionary
     						"active",
     						"?" 
   					),	
-    				"type" =>"atkBoolAttribute",
+    				"type" =>"BoolAttribute",
     				"params" =>"",
   					"dbtype" =>"INT(1)"
     				),		

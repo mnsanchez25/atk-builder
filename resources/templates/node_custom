@@ -1,13 +1,10 @@
 <?php
-include_once("class.${ndenme}_base.inc");
+
+namespace ${appnme};
 
 class ${ndenme} extends ${ndenme}_base
 {
-	function ${ndenme}()
-	{
-		$this->${ndenme}_base("${ndenme}");
 	
-	}
 }
 
 ?>

@@ -2,6 +2,8 @@
 
 namespace atkbuilder;
 
+define(DS, DIRECTORY_SEPARATOR);
+
 class RunGen extends AbstractCodeCreator
 {
 	public function __construct($basedir, DataDictionary $dd)
@@ -11,7 +13,7 @@ class RunGen extends AbstractCodeCreator
 		$this->dd=$dd->dd;
 		$this->parent_node="Node";
 		$this->basedir=$basedir;	
-		$this->modules_dir=$this->basedir."/modules";	
+		$this->modules_dir=$this->basedir.DS."App".DS."Modules";	
 		$GLOBALS['syslog']->finish();
 	}
 	
@@ -30,22 +32,22 @@ class RunGen extends AbstractCodeCreator
 		$GLOBALS['syslog']->enter();
 		$module_name=trim($module_name);
 		$GLOBALS['syslog']->debug("Processing Module: ".$module_name, 1);
-		$module_dir=$this->modules_dir.'/'.$module_name;	
+		$module_dir=$this->modules_dir.DS.ucfirst($module_name);	
 		FsManager::ensureFolderExists($module_dir);
 		//Build module structure
 		$folders=array('install', 'languages', 'themes');
 		foreach ($folders as $folder) 
-			FsManager::ensureFolderExists($module_dir.'/'.$folder);
+			FsManager::ensureFolderExists($module_dir.DS.$folder);
 		//Build nodes
 		foreach ($this->dd['modules'][$module_name]['nodes'] as $node_name => $node_contents)
 			$this->processNode($module_dir,$node_name,$node_contents);
-		//Build module inc 	
-		$module_inc_custom_file=$module_dir.'/'."module.inc";
-		if(!FsManager::fileExists($module_inc_custom_file))
-			$this->buildModuleCustomFile($module_name, $mod_dir, $module_def, $module_inc_custom_file);
+		//Build module class 	
+		$module_custom_file=$module_dir.DS."Module.php";
+		if(!FsManager::fileExists($module_custom_file))
+			$this->buildModuleCustomFile($module_name, $module_dir, $module_def, $module_custom_file);
 			
 		
-		$module_base_file=$module_dir.'/'.$module_name."_base.inc";
+		$module_base_file=$module_dir.DS.ucfirst($module_name)."_base.php";
 		$this->buildModuleBase($module_name, $module_dir, $module_def, $module_base_file);
 		//Build Language files				
 		$this->modules_build_language_files($module_dir, $module_def);
@@ -57,24 +59,24 @@ class RunGen extends AbstractCodeCreator
 	private function buildModuleCustomFile($mod_name, $mod_dir, $def, $destination)
 	{
 		$GLOBALS['syslog']->enter();
+		$record = [];
 		$record['modnme']=$mod_name;
-		$this->createFromTemplate('templates/module_custom', $record, $destination);
-		$GLOBALS['syslog']->finish();
-		return $output;		
+		$this->createFromTemplate('templates'.DS.'module_custom', $record, $destination);
+		$GLOBALS['syslog']->finish();		
 	}
 	
 	private function modules_build_config_modules_base()
 	{
 		$GLOBALS['syslog']->enter();
-		$config_modules_base_file=$this->modules_dir.'/'."config.modules_base.inc";
+		$config_modules_base_file=$this->modules_dir.DS."config.modules_base.inc";
 		$GLOBALS['syslog']->debug("...Building:".$config_modules_base_file,1);
 		$file_contents="<?php\n";
 		$file_contents.="\n";
 		foreach ($this->dd['modules'] as $module_name => $module_contents) 
-			$file_contents.="\tmodule(\"".$module_name."\");\n";
+			$file_contents.="\tApp\\Modules\\".ucfirst($module_name)."\\Module::class,\n";
     	$file_contents.="\n";
 		$file_contents.="?>\n";
-		file_put_contents($config_modules_base_file, $file_contents);
+		FsManager::filePutContents($config_modules_base_file, $file_contents);
 		$GLOBALS['syslog']->finish();	
 	}
 	
@@ -110,8 +112,8 @@ class RunGen extends AbstractCodeCreator
 			$record = $this->diff_with_previous_version($module_name,$module_contents);
 			if ($record['has_patch'] == true)
 				$GLOBALS['syslog']->log("DB Structure changed, plese run setup.php. Changed Node:".$node,0);
-			$patch_file=$install_dir."/patch-".trim($vs['version'].".inc");
-			$this->createFromTemplate('templates/patch_file',$record, $patch_file);
+			$patch_file=$install_dir.DS."patch-".trim($vs['version'].".inc");
+			$this->createFromTemplate('templates'.DS.'patch_file',$record, $patch_file);
 		}
 		$this->putModuleVersionNumberAndSignature($module_dir, $vs);
 		$GLOBALS['syslog']->finish();
@@ -119,6 +121,7 @@ class RunGen extends AbstractCodeCreator
 	
 	private function diff_with_previous_version($module_name, $module_contents)
 	{
+		$record = [];
 		$record['node_install']='';
 		$record['table_drop']='';
 		$record['col_add']='';
@@ -184,7 +187,7 @@ class RunGen extends AbstractCodeCreator
 				}
 			}			
 			//Columns in table but no Attributes in model => Columns to Drop
-			foreach ($metadata as $col => $col_def) 
+			foreach (array_keys($metadata) as $col) 
 			{
 				//Don't check automatic fields present in Node
 				if (array_search($col, array("id", "system_reserved", "created_at", "created_by", "updated_at", "updated_by")) === false)
@@ -205,7 +208,7 @@ class RunGen extends AbstractCodeCreator
 	private function putModuleVersionNumberAndSignature($module_dir, $vs)
 	{
 		$GLOBALS['syslog']->enter();
-		$signature_file=$lang_file=$module_dir."/module.sgn";
+		$signature_file=$module_dir.DS."module.sgn";
 		FsManager::filePutContents($signature_file, trim($vs['version']).':'.$vs['signature']);
 		$GLOBALS['syslog']->finish();
 	}
@@ -216,7 +219,7 @@ class RunGen extends AbstractCodeCreator
 		//Calc a signature for the modul it will be used to check if the node needs
 		//To change to a upper version number
 		$signature= md5(var_export($module_contents['attrs'],true));
-		$signature_file=$lang_file=$module_dir."/module.sgn";
+		$signature_file=$module_dir.DS."module.sgn";
 		if(!FsManager::fileExists($signature_file))
 		{
 			FsManager::filePutContents($signature_file, '1:'.$signature);
@@ -238,18 +241,18 @@ class RunGen extends AbstractCodeCreator
 		{
       $record=array();
 			$lang_file_base=$module_dir."/languages/".$lng.".lng";						
-			$GLOBALS['syslog']->debug("Building language file:".$lang_file,1);
+			$GLOBALS['syslog']->debug("Building language file:".$lang_file_base,1);
 			$record['lngide'] = strtolower($lng);
 			$record['lsttrl'] = '';
 			foreach($module_contents['languages'] as  $entry)
 				$record['lsttrl'] .= "\t\t".$entry."\n";				
-			$lang_custom_file=$module_dir."/languages/".$lng."_custom.lng";
+			$lang_custom_file=$module_dir.DS."languages".DS.$lng."_custom.lng";
 			if(!FsManager::fileExists($lang_custom_file))
-				$this->createFromTemplate('/templates/blank_file', $record, $lang_custom_file);
+				$this->createFromTemplate(DS.'templates'.DS.'blank_file', $record, $lang_custom_file);
 			
 			$lang_custom_file_contents= FsManager::fileGetContents($lang_custom_file);
 			$record['custrl'] = $lang_custom_file_contents;
-			$this->createFromTemplate('/templates/language_file', $record, $lang_file_base);
+			$this->createFromTemplate(DS.'templates'.DS.'language_file', $record, $lang_file_base);
 		}
 		$GLOBALS['syslog']->finish();	
 	}
@@ -257,31 +260,35 @@ class RunGen extends AbstractCodeCreator
 	private function buildModuleBase($module_name, $module_dir, $module_contents, $destination)
 	{
 		$GLOBALS['syslog']->enter();	
-			
+		$record = [];
 		$record['modnme'] = $module_name;
 		$record['mnulbl'] = $module_contents['description'];
 		$record['enbarr'] = '';
 		foreach ($module_contents['nodes'] as $node => $node_def)
 				$record['enbarr'].="\t\t\t\t\t\t\"".$node_def['module'].".".$node_def['id']."\", \"".$node_def['actions'][0]."\", \n";
-		$record['mnulst'] = '';
+		
+		//Create Menu Items
+		$record['menu_items'] = '';
+		$record['menu_items'] .="\t\t\$this->addMenuItem('".$module_name."')";
 		foreach ($module_contents['nodes'] as $node => $node_def)
 		{
 			$node_desc = $node_def['description'];
 			$action = $node_def['actions'][0];
-			$url="dispatch_url(\"".$node_def['module'].".".$node_def['id']."\",\"$action\")";
 			if ($node_def['nomenu'] == false)
-				$record['mnulst'] .="\t\t\$this->menuitem(atktext(\"$node_desc\"),$url, \$menu_label);\n";
-		}	 	
-		$record['genlst'] = '';
+				$record['menu_items'] .="\t\t\$this->addNodeToMenu(atktext(\"$node_desc\"),$node, $action, $module_name);\n";
+		}	
+		//Register nodes
+		$record['register_nodes'] = '';
 		foreach ($module_contents['nodes'] as $node => $node_def)
 			{
 				$node = $node_def['id'];
 				//print $node_def['id']."\n";
 				//print_r($node_def);
 				$auth_entries=implode("', '", $node_def['actions']);
-				$auth_array="array('".$auth_entries."')";
-				$record['genlst'].="\t\tregisterNode(\$this->module.\".$node\", $auth_array);\n";
+				$auth_array="['".$auth_entries."']";
+				$record['register_nodes'].="\t\t\$this->registerNode('".strtolower($node). "'," .ucfirst($node)."::class,". $auth_array.");\n";
 			}	 	
+		/*	
 		$record['sealst'] = '';	
 		foreach ($module_contents['nodes'] as $node => $node_def)
 		{				
@@ -292,23 +299,24 @@ class RunGen extends AbstractCodeCreator
 				$record['sealst'].="\t\t\$node = &atkGetNode(\$this->module.\".$node\");\n";
 				$record['sealst'].="\t\t\$results[\"$node_label\"] = \$this->recLinks(\$node->searchDb(\$expression),\$this->module.\".$node\");\n";
 			}		
-		}		
-		$this->createFromTemplate('/templates/module_base', $record, $destination);	
+		}
+		*/		
+		$this->createFromTemplate(DS.'templates'.DS.'module_base', $record, $destination);	
 		$GLOBALS['syslog']->finish();
 	}
 	
 	private function processNode($module_dir, $node_name, $node_contents)
 	{
 		$GLOBALS['syslog']->enter();
-		$node_name=trim($node_name);
+		$node_name=ucfirst(trim($node_name));
 		$GLOBALS['syslog']->debug("..Processing Node: ".$node_name,1);
 		
-		$node_custom_file=$module_dir."/class.".$node_name.".inc";
+		$node_custom_file=$module_dir.DS.$node_name.".php";
 		
 		if(!FsManager::fileExists($node_custom_file))
 			$this->buildNodeCustom($node_name, $node_contents, $node_custom_file);
 
-		$node_base_file=$module_dir."/class.".$node_name."_base.inc";
+		$node_base_file=$module_dir.DS.$node_name."_base.php";
 		$this->buildNodeBase($node_name, $node_contents, $node_base_file);
 		
 		$GLOBALS['syslog']->finish();	
@@ -317,6 +325,7 @@ class RunGen extends AbstractCodeCreator
 	private function buildNodeBase($node_name, $node_contents, $destination)
 	{
 		$GLOBALS['syslog']->enter();
+		$record = [];
 		$record['ndenme']=$node_name;
 		$record['parnde']=$node_contents['type'];
 
@@ -340,18 +349,17 @@ class RunGen extends AbstractCodeCreator
 			$record['attlst'].="\t\t\$this->add(new $atkatr, $tab, $count);\n";
 			$count = $count + 10;	
 		}	
-		$this->createFromTemplate('templates/node_base',$record, $destination);
+		$this->createFromTemplate('templates'.DS.'node_base',$record, $destination);
 		$GLOBALS['syslog']->finish();
-		return $output;
 	}
 	
 	private function buildNodeCustom($node_name, $node_contents,$destination)
 	{
 		$GLOBALS['syslog']->enter();
+		$record=[];
 		$record['ndenme']=$node_name;
-		$this->createFromTemplate('templates/node_custom',$record, $destination);
+		$this->createFromTemplate('templates'.DS.'node_custom',$record, $destination);
 		$GLOBALS['syslog']->finish();
-		return $output;
 	}
 }
 ?>
