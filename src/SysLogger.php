@@ -1,6 +1,8 @@
 <?php
 namespace atkbuilder;
 
+use PEAR2\Console\CommandLine\Exception;
+
 define("LOG_DEBUG" 	,		4);
 
 class SysLogger

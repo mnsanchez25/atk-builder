@@ -42,7 +42,7 @@ abstract class AbstractCodeCreator
 		$conn = mysql_connect($this->dbhost, $this->dbuser,$this->dbpass);
 		if (!$conn)
 			throw new Exception("Could not connect to database server with the supplied parameters. (User:".$this->dbuser." ,Pass:".$this->dbpass.")");
-		$dbname = $this->dbname;
+		
 		$result = mysql_query($query);
 		$GLOBALS['syslog']->debug("ExecSql:".$query,1);
 		$row = null;

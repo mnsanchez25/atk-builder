@@ -25,4 +25,10 @@
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 		<nature>org.eclipse.php.core.PHPNature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>MOZILLA_FIVE_HOME</name>
+			<value>file:/usr/lib/xulrunner</value>
+		</variable>
+	</variableList>
 </projectDescription>

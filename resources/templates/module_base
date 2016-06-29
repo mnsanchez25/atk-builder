@@ -1,12 +1,13 @@
-namespace App\Modules\${module_name};
+<?php
+namespace App\Modules\${modnme};
 
 use Sintattica\Atk\Core\Atk;
 use Sintattica\Atk\Core\Tools;
 use Sintattica\Atk\Core\Menu;
 
-class Module extends \Sintattica\Atk\Core\Module
+class Module_base extends \Sintattica\Atk\Core\Module
 {
-    static $module = '${module_name}';
+    static $module = '${modnme}';
 
     public function boot()
     {
@@ -19,9 +20,9 @@ class Module extends \Sintattica\Atk\Core\Module
     {
     	$results = array();
     	
-    	${search_items}	
+    	${sealst}	
     	
     	return $results;
     }
 }
-
+?>

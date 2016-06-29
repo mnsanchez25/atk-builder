@@ -1,6 +1,6 @@
 <?php
 
-namespace ${appnme};
+namespace App\Modules\${modnme};
 
 class ${ndenme} extends ${ndenme}_base
 {

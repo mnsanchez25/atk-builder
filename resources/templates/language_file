@@ -1,8 +1,8 @@
 <?php
 
-$${lngide} = array(
+return [
 	${lsttrl}
 	${custrl}
-);
+];
 
 ?>

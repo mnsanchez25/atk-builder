@@ -172,8 +172,8 @@ class DataDictionary
 	    			$type=$suggested_type['type'];
 	    	  		if ($suggested_type['params'] !="")
     		  		{
-	    				if ($params!="") $params = "| ".$params;
-	    			  	$params= $suggested_type['params'].$params;
+	    				if ($params!="") $params = $params." | ";
+	    			  	$params= $params.$suggested_type['params'];
     		  		}
         		}	
 				$tags[TAATR_DESCRIPTION]=trim($tags[TAATR_DESCRIPTION]);
@@ -197,14 +197,16 @@ class DataDictionary
     		list($filler, $normalized) = explode("hasmany_", $field_name);
     		list($module,$node_id) = explode("__",$normalized);
     		$key=$this->cur_mod."__".$this->cur_nod."_id";
-       		return array("type"=>"OneToManyRelation", "params"=>"'".$module.".".$node_id."','".$key."',NULL");	
+       		return array("type"=>"OneToManyRelation", "params"=>"NULL,'".ucfirst($module).".".ucfirst($node_id)."','".$key."'");	
     	}    	
     	
         list($module,$node_id) = explode("__",$field_name);
         if (($module !="") and ($node_id!=""))
         {
         	list($node,$id) = explode("_id", $node_id);
-    		return array("type"=>"ManyToOneRelation", "params"=>"'".$module.".".$node."', AF_RELATION_AUTOCOMPLETE|AF_RELATION_AUTOLINK", 'dbtype'=>'bigint');
+    		return array("type"=>"ManyToOneRelation", 
+    				"params"=>"AF_RELATION_AUTOCOMPLETE|AF_RELATION_AUTOLINK, '".ucfirst($module).".".ucfirst($node)."'", 
+    				'dbtype'=>'bigint');
         }	
         $fdict=$this->getFieldDictionary();
     	foreach ($fdict as $entry)
@@ -243,7 +245,7 @@ class DataDictionary
     						"fecha", 
   					),	
     				"type" =>"DateAttribute",
-    				"params" =>"'d/m/Y', 'd/m/Y', NULL, NULL, AF_DATE_STRING",
+    				"params" =>"AF_DATE_STRING, 'd/m/Y', 'd/m/Y', NULL, NULL",
     				"dbtype" =>"DATE"
     				),
     			array(
@@ -280,7 +282,8 @@ class DataDictionary
     						"haber",
                 			"saldo",
                 			"ammount",
-                			"price",
+											"price",
+											"total"	
   					),	
     				"type" =>"CurrencyAttribute",
     				"params" =>"",

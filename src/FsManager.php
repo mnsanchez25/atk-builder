@@ -93,7 +93,11 @@ class FsManager
 	public static function filePutContents($file, $contents)
 	{
 		$file = FsManager::normalizePath($file);
-		file_put_contents($file, $contents);
+		$bytes_written=file_put_contents($file, $contents);
+		if ($bytes_written === false)
+		{
+			throw new Exception("Could'nt write file:"+$file);
+		}
 		chmod($file,0774);
 	}
 	

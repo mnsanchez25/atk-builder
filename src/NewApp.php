@@ -41,11 +41,23 @@ class NewApp extends AbstractCodeCreator
 		$this->assertDatabaseNew();
 		$this->extractFramework();
 		$this->createDefFile();
+		$this->createAtkBuilderNode();
 		$this->createEnvFile();
+		$this->updateConfig();
 		$GLOBALS['syslog']->finish();	
 	}
 	
-	
+	private function updateConfig($modules_list)
+	{
+		$config_file = $this->modules_dir.DS.'..'.DS.'..'.DS.'config'.DS.'atk.php';
+		$config_contents = FsManager::fileGetContents($config_file);
+		$start_offset = strpos($config_contents, "'identifier' = > '");
+		$end_offset = strpos($config_contents, "',", $start_offset);
+		$config_contents =	substr($config_contents, 0, $start_offset).
+		"'identifier' => '". $this->appnme .
+		substr($config_contents,$end_offset);
+		FsManager::filePutContents($config_file, $config_contents);
+	}
 	private function assertDatabaseNew()
 	{
 		$dbname=$this->dbname;
@@ -71,6 +83,14 @@ class NewApp extends AbstractCodeCreator
 		$GLOBALS['syslog']->finish();						
 	}
 	
+	private function createAtkBuilderNode()
+	{					
+		$GLOBALS['syslog']->enter();
+		$record = array();
+		$this->createFromTemplate('templates'.DIRECTORY_SEPARATOR.'AtkBuilderNode.php', $record, $this->full_basedir.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Modules');	
+		$GLOBALS['syslog']->finish();						
+	}
+
 	private function createEnvFile()
 	{					
 		$GLOBALS['syslog']->enter();
