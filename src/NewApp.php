@@ -42,12 +42,13 @@ class NewApp extends AbstractCodeCreator
 		$this->extractFramework();
 		$this->createDefFile();
 		$this->createAtkBuilderNode();
+		$this->createSetupModule();
 		$this->createEnvFile();
 		$this->updateConfig();
 		$GLOBALS['syslog']->finish();	
 	}
 	
-	private function updateConfig($modules_list)
+	private function updateConfig()
 	{
 		$config_file = $this->modules_dir.DS.'..'.DS.'..'.DS.'config'.DS.'atk.php';
 		$config_contents = FsManager::fileGetContents($config_file);
@@ -88,6 +89,16 @@ class NewApp extends AbstractCodeCreator
 		$GLOBALS['syslog']->enter();
 		$record = array();
 		$this->createFromTemplate('templates'.DIRECTORY_SEPARATOR.'AtkBuilderNode.php', $record, $this->full_basedir.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Modules');	
+		$GLOBALS['syslog']->finish();						
+	}
+	
+	private function createSetupModule()
+	{					
+		$GLOBALS['syslog']->enter();
+    	$source=$GLOBALS['syscfg']->cpbdir.DIRECTORY_SEPARATOR."resources".DIRECTORY_SEPARATOR;
+		$from=$source.DIRECTORY_SEPARATOR.'tools'.DIRECTORY_SEPARATOR.'Setup';
+		$to= $this->full_basedir.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'Modules';	
+		FsManager::copy($from,$to);
 		$GLOBALS['syslog']->finish();						
 	}
 

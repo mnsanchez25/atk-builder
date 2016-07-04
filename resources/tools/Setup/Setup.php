@@ -45,8 +45,8 @@ use Sintattica\Atk\Core\Config;
 
     function __construct()
     {
-      	parent::___construct("setup");
-      	$ip=$_SERVER['REMOTE_ADDR'];
+      parent::___construct("Setup");
+      $ip=$_SERVER['REMOTE_ADDR'];
   		$ips_allowed=split(",",Config::getGlobals("setup_allowed_ips"));
   
   		if (!atk_in_array($ip, $ips_allowed) ) 

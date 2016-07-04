@@ -4,7 +4,10 @@ namespace App\Modules\${modnme};
 
 class ${ndenme} extends ${ndenme}_base
 {
-	
+	public function __construct($nodeUri, $flags=null)
+	{
+		parent::__construct($nodeUri, $flags);
+	}	
 }
 
 ?>

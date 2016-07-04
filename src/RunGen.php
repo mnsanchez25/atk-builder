@@ -72,7 +72,7 @@ class RunGen extends AbstractCodeCreator
 		$GLOBALS['syslog']->enter();
 		$config_modules_base_file=$this->modules_dir.DS."config.modules_base.inc";
 		$GLOBALS['syslog']->debug("...Building:".$config_modules_base_file,1);
-		$modules_list="";
+		$modules_list="\tApp\\Modules\\Setup\\Module::class,\n";
 		foreach (array_keys($this->dd['modules']) as $module_name ) 
 			$modules_list.="\tApp\\Modules\\".ucfirst($module_name)."\\Module::class,\n";
     	
