@@ -22,5 +22,8 @@
 		"psr-4" : {
 			"atkbuilder\\" : "src"
 		}
+	},
+	"require-dev": {
+		"clue/phar-composer": "^1.0"
 	}
 }

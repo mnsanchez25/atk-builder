@@ -5,6 +5,22 @@
 ### What is this?
 atk-builder is a code generator tool for the ATK Framework (See https://github.com/Sintattica/atk ).
 
+### Installing
+Grab the atk-builder.phar file from the releases pages and the make it executable.
+In an standard linux system, place yourself in the directory where you have donwloaded the atk-builder.phar file and execute te following commands:
+
+- sudo chmod +x atk-builder.phar
+- sudo mv atk-builder.phar /usr/local/bin/atk-builder
+
+Now you can invoke atk-builder like this:
+
+- atk-builder
+
+You can read the built in help with :
+
+- atk-builder --help
+
+
 ### How does it works?
 The idea behind atk-builder is to write the minimun possible to have a fully functional ATK application.
 An ATK application is built around modules, nodes and attributes, you normally make a folder inside the modules folders and populate that folder with classes derived from the **Node.class**, that node will correspond to a database table. In the node class you declare the table and add an attribute for every column, any time you change the table structure you have to fix the node class to reflect the changes,  the process, albeit simple, is time consuming.
