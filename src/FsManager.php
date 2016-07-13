@@ -52,7 +52,11 @@ class FsManager
 	
 	public static function normalizePath($path)
 	{
-		return str_replace("/",  DIRECTORY_SEPARATOR, $path);
+		$path=str_replace("/",  DIRECTORY_SEPARATOR, $path);
+		$path=str_replace("//",  DIRECTORY_SEPARATOR, $path);
+		$path=str_replace("\\",  DIRECTORY_SEPARATOR, $path);
+		$path=str_replace("\\\\",  DIRECTORY_SEPARATOR, $path);
+		return $path;
 	}
 	
 	public static function copy($from, $to)
@@ -67,6 +71,7 @@ class FsManager
 	
 	public static function chmod($from, $auth)
 	{
+		/*
 		$from = FsManager::normalizePath($from);
 		
 		$GLOBALS['syslog']->debug("Chmod -R".$auth." ".$from." from:".$from,1);
@@ -77,17 +82,19 @@ class FsManager
 		$chmod = " chown -R www-data:www-data \"$from\" ";
 		$GLOBALS['syslog']->debug($chmod,2);
 		system($chmod);
-
+		*/
 	}
 	
   public static function chown($from, $own)
 	{
+		/*
 		$from = FsManager::normalizePath($from);
 		
 		$GLOBALS['syslog']->debug("Chown -R ".$own." ".$from." from:".$from,1);
 		$chown = " chown -R ${own} \"$from\" ";
 		$GLOBALS['syslog']->debug($chown,2);
 		system($chown);
+		*/
 	}
 
 	public static function filePutContents($file, $contents)

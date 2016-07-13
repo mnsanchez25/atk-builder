@@ -1,11 +1,17 @@
 <?php
 
+namespace App\Modules\Setup;
+
+use Sintattica\Atk\Attributes\Attribute;
+use Sintattica\Atk\Attributes\Attribute as A;
+use Sintattica\Atk\Core\Node;
+	
 class license extends atkNode
 {
-  function license() 
+  function __construct($nodeUri, $flags=null)
   {
-    $this->atkNode("license",NF_NO_SECURITY);
-  }
+		parent::__construct($nodeUri, $flags |  NF__NO_SECURITY);
+	}
   
   // Page functions
   function action_view(&$handler)

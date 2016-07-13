@@ -4,9 +4,8 @@ namespace App\Modules\Setup;
 use Sintattica\Atk\Attributes\Attribute;
 use Sintattica\Atk\Attributes\FieldSet;
 use Sintattica\Atk\Handlers\ActionHandler;
-use Sintattica\Atk\Session\SessionManager;
-use Sintattica\Atk\Ui\Page;
 use Sintattica\Atk\Ui\Ui;
+use Sintattica\Atk\Ui\Page;
 use Sintattica\Atk\Ui\PageBuilder;
 use Sintattica\Atk\Db\Db;
 use Sintattica\Atk\Utils\Selector;
@@ -18,7 +17,11 @@ use Sintattica\Atk\Relations\ManyToOneRelation;
 use Sintattica\Atk\Utils\StringParser;
 use Sintattica\Atk\Utils\DirectoryTraverser;
 use Sintattica\Atk\Db\Query;
+use Sintattica\Atk\Core\Atk;
 use Sintattica\Atk\Core\Config;
+use Sintattica\Atk\Core\Node;
+use Sintattica\Atk\Core\Tools;
+use Sintattica\Atk\Session\SessionManager;
 		
   /**
    * You might have noticed, that the module.inc file for the setup module
@@ -45,11 +48,11 @@ use Sintattica\Atk\Core\Config;
 
     function __construct()
     {
-      parent::___construct("Setup");
-      $ip=$_SERVER['REMOTE_ADDR'];
-  		$ips_allowed=split(",",Config::getGlobals("setup_allowed_ips"));
+      	//parent::___construct("setup");
+      	$ip=$_SERVER['REMOTE_ADDR'];
+  		$ips_allowed=split(":",Config::getGlobal("setup_allowed_ips"));
   
-  		if (!atk_in_array($ip, $ips_allowed) ) 
+  		if (!Tools::atk_in_array($ip, $ips_allowed) ) 
   		{
   			die("Setup can only be called from authorized IP addresses, consult your sysadmin.Your IP:".$ip);
   		}	
@@ -99,7 +102,7 @@ use Sintattica\Atk\Core\Config;
 
     function getDbStatus()
     {
-      $db = &atkGetDb();
+      $db = $this->getDb();
 
       // We don't want the db class to display error messages, because
       // we handle the error ourselves.
@@ -108,7 +111,7 @@ use Sintattica\Atk\Core\Config;
 
       $res = $db->connect();
 
-      $dbconfig = atkconfig("db");
+      $dbconfig = Config::getGlobal("db");
 
       if ($res==DB_SUCCESS && (strpos($dbconfig["default"]["driver"], "mysql") === 0))
       {
@@ -197,14 +200,14 @@ use Sintattica\Atk\Core\Config;
 
     function setupScreen($title, $output, $nextaction="", $params=array())
     {
-      atkimport("atk.ui.atkui");
-      $ui = &atkUI::getInstance();
+      $ui = &Ui::getInstance();
+      $sm = SessionManager::getInstance();
 
       $form = '<div align="left"><b>'.$title.'</b><br><br>';
-
-      $form.= '<form action="'.($nextaction=="Applicationstart"?"index.php":"setup.php").'">'.
-               session_form(SESSION_NEW).
-               '<input type="hidden" name="atkaction" value="'.$nextaction.'">'.
+			//$form.= '<form action="'.($nextaction=="Applicationstart"?"index.php":"setup.php").'">';
+			$form.= '<form action="index.php">';
+			$form.= $sm->formState(SESSION_NEW);
+			$form.='<input type="hidden" name="atkaction" value="'.$nextaction.'">'.
                $output;
 
       if (count($params))
@@ -234,16 +237,16 @@ use Sintattica\Atk\Core\Config;
 
       $form.= '</form></div>';
 
-      $page = &atkPage::getInstance();
-      $theme = &atkTheme::getInstance();
-      $page->register_style($theme->stylePath("style.css"));
+      $page = &Page::getInstance();
+      //$theme = &Theme::getInstance();
+      //$page->register_style($theme->stylePath("style.css"));
       $page->addContent($ui->renderBox(array("content"=>$form, "title"=>$title)));
 
     }
 
     function getTableNames()
     {
-      $db = &atkGetDb();
+      $db = &$this->GetDb();
 
       $tablenames=array();
       $tables = $db->table_names();
@@ -264,7 +267,7 @@ use Sintattica\Atk\Core\Config;
 
       if ($res == DB_SUCCESS)
       {
-        $dbconfig = $dbconfig = atkconfig("db");
+        $dbconfig = Config::getGlobal("db");
 
         $tablenames = $this->getTableNames();
 
@@ -369,15 +372,15 @@ use Sintattica\Atk\Core\Config;
 
     function action_installdb(&$handler)
     {
-      global $g_modules;
 
+      $g_modules = Atk::getInstance()->g_modules;
       // We loop through the modules to install them.
       // The setup module contains essential table needed for the installation process,
       // so we install this first.
       $result = array();
       $ok = true;
 
-      if ($this->installModule("setup", $result))
+      if ($this->installModule("Setup", $result))
       {
         foreach (array_keys($g_modules) as $modname)
         {
@@ -385,7 +388,7 @@ use Sintattica\Atk\Core\Config;
           {
             if (!$this->installModule($modname, $result, true))
             {
-              atkdebug("Installation failed.");
+              Tools::atkdebug("Installation failed.");
               $ok = false;
               break;
             }
@@ -468,12 +471,12 @@ use Sintattica\Atk\Core\Config;
      */
     function installModule($modname, &$result, $resolvedeps=false)
     {
-      atkdebug("installModule call for $modname");
+      Tools::atkdebug("installModule call for $modname");
       // Cycle protection.
       if ($result[$modname]=="ok")
       {
         // Module is already installed.
-        atkdebug("Module ".$modname." already installed in this run.");
+        Tools::atkdebug("Module ".$modname." already installed in this run.");
         return true;
       }
       else if ($result[$modname]=="faileddep")
@@ -483,7 +486,7 @@ use Sintattica\Atk\Core\Config;
         // to be installed again. This will lead to a loop, so we must
         // stop the installation.
         $result[$modname] = "cyclicdep";
-        atkdebug("Module ".$modname." has cyclical dependency.");
+        Tools::atkdebug("Module ".$modname." has cyclical dependency.");
         return false;
       }
 
@@ -496,15 +499,15 @@ use Sintattica\Atk\Core\Config;
       if (in_array($modname, $installed_mods))
       {
         $result[$modname] = "alreadyinstalled";
-        atkdebug("Module ".$modname." already installed in previous run.");
+        Tools::atkdebug("Module ".$modname." already installed in previous run.");
         return true;
       }
 
-      $module = getModule($modname);
+      $module = Atk::getInstance()->atkGetModule($modname);
       if (!is_object($module))
       {
         $result[$modname] = "notfound";
-        atkdebug("Module ".$modname." could not be found.");
+        Tools::atkdebug("Module ".$modname." could not be found.");
         return false;
       }
 
@@ -520,7 +523,7 @@ use Sintattica\Atk\Core\Config;
       }
       else
       {
-        atkdebug("Warning: $modname might not be an Application module.");
+        Tools::atkdebug("Warning: $modname might not be an Application module.");
       }
 
       for ($i=0, $_i=count($deps); $i<$_i; $i++)
@@ -528,19 +531,19 @@ use Sintattica\Atk\Core\Config;
         if (!in_array($deps[$i], $installed_mods))
         {
           // Dependency not met.
-          atkdebug("Resolving dependency ".$deps[$i]." for $modname");
+          Tools::atkdebug("Resolving dependency ".$deps[$i]." for $modname");
           $result[$modname] = "faileddep";
           if ($resolvedeps)
           {
             if (!$this->installModule($deps[$i], $result, true))
             {
-              atkdebug("Stopping install of $modname. Resolving dependencies failed");
+              Tools::atkdebug("Stopping install of $modname. Resolving dependencies failed");
               return false; // dependencies coult not be resolved. Give up.
             }
           }
           else
           {
-            atkdebug("Stopping install of $modname. Dependencies not met");
+            Tools::atkdebug("Stopping install of $modname. Dependencies not met");
             return false;
           }
         }
@@ -548,21 +551,22 @@ use Sintattica\Atk\Core\Config;
 
       // if we get here, all dependencies are either resolved, or we have given up already
       // and returned false. Next thing to do is perform the database installation.
-      $installfile = moduleDir($modname)."install/install.inc";
+      $installfile = Atk::getInstance()->moduleDir($modname)."install/install.inc";
+				 ;
       if ($this->needsInstall($modname))
       {
         $this->includeInstallFile($modname, $installfile);
         if (!$this->m_cancontinue)
         {
           //  Something went wrong.
-          atkdebug("Detected an error during the installation of $modname");
+          Tools::atkdebug("Detected an error during the installation of $modname");
           $result[$modname] = "failed";
           return false;
         }
         else
         {
           // if we get here, everything should be installed.
-          atkdebug("Installed $modname");
+          Tools::atkdebug("Installed $modname");
           $result[$modname] = "ok";
           return true;
         }
@@ -578,7 +582,7 @@ use Sintattica\Atk\Core\Config;
     function includeInstallFile($modname, $installfile)
     {
       // give included file access to $db and $this ("$setup");
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $setup = &$this;
 
       // also set 'current module' to the module were now installing. This will
@@ -593,7 +597,7 @@ use Sintattica\Atk\Core\Config;
 
     function needsInstall($modname)
     {
-      $installfile = moduleDir($modname)."install/install.inc";
+      $installfile = Atk::getInstance()->moduleDir($modname)."install/install.inc";
       return (file_exists($installfile));
     }
 
@@ -624,7 +628,7 @@ use Sintattica\Atk\Core\Config;
 
       if ($this->hasVersionInfo())
       {
-        $versioninfo = &atkGetNode("setup.versioninfo");
+        $versioninfo = &Atk::GetInstance()->atkGetNode("Setup.Versioninfo");
 
         if (is_object($versioninfo)) // If this object doesn't exist, we don't have
                                      // a correct installer, so we can only return
@@ -632,10 +636,10 @@ use Sintattica\Atk\Core\Config;
         {
           // for fresh installations the versioninfo doesn't exist. we set
           // errorreporting to silent, because we don't want to know this.
-          $db = &atkGetDb();
+          $db = &$this->getDb();
           $curhaltval = $db->m_haltonerror;
           $db->m_haltonerror = false;
-          $rows = $versioninfo->selectDb();
+          $rows = $versioninfo->select();
           $db->m_haltonerror = $curhaltval; // reset to original state.
           for ($i=0, $_i=count($rows); $i<$_i; $i++)
           {
@@ -652,28 +656,28 @@ use Sintattica\Atk\Core\Config;
       if (!$this->m_cancontinue) return false;
 
       // Add a statement to the debuglog indication this installNode call
-      atkdebug("Installnode call for $nodename");
+      Tools::atkdebug("Installnode call for $nodename");
 
       // Get an instance of the node we're about to install
-      $node = &atkGetNode($nodename);
+      $node = &Atk::GetInstance()->atkGetNode($nodename);
 
       // Don't continue if the node can't be found
       if (!is_object($node))
       {
-        atkdebug("setup::installNode: node $node not found.");
+        Tools::atkdebug("setup::installNode: node $node not found.");
         return false;
       }
 
       // We have to check if the table already exists. If it exists, we may need to
       // add columns to it.
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $meta = $db->metadata($node->m_table, true);
 
       // If the table is found, but no data could be retrieved, it is unsafe to continue the
       // installation and the report should be shown to the user
       if ((!is_array($meta)||count($meta)<=0) && in_array($node->m_table, $this->getTableNames()))
       {
-        atkdebug("Table exists, but metadata is not present. I cannot continue installation without metadata");
+        Tools::atkdebug("Table exists, but metadata is not present. I cannot continue installation without metadata");
         $this->report("I could not read metadata from the database, so I
                         cannot continue the installation. Please verify your
                         database setup and try again.
@@ -688,7 +692,7 @@ use Sintattica\Atk\Core\Config;
       // If the instance isn't created, show the user his database is probably not supported by this script
       if (!is_object($ddl))
       {
-        atkdebug("setup::installNode: ddl class not found");
+        Tools::atkdebug("setup::installNode: ddl class not found");
         $this->report("Your database is not supported by the automatic
                       installscript. If you think it should be, please
                       post a message in the <a href=\"http://www.Application.org/forum\">Application forum</a>.", "error");
@@ -701,11 +705,11 @@ use Sintattica\Atk\Core\Config;
       $lookupfields = array();
       if (count($meta)==0 || $meta["num_fields"]==0)
       {
-        atkdebug("Table ".$node->m_table." does not exist; creating...");
+        Tools::atkdebug("Table ".$node->m_table." does not exist; creating...");
       }
       else
       {
-        atkdebug("Table ".$node->m_table." already exists; performing diff...");
+        Tools::atkdebug("Table ".$node->m_table." already exists; performing diff...");
 
         // Fill the lookupfields array containing fieldname=>metadata key-value pairs.
         for ($i=0, $_i=count($meta); $i<$_i; $i++)
@@ -754,11 +758,11 @@ use Sintattica\Atk\Core\Config;
           {
             // field exists. assume it's ok.
             /** @todo Verify size and type and if necessary, alter the column. */
-            atkdebug("Field {$fieldnames[$i]} already exists");
+            Tools::atkdebug("Field {$fieldnames[$i]} already exists");
           }
           else
           {
-            atkdebug("Field {$fieldnames[$i]} does not exist. Adding to create/alter table queue...");
+            Tools::atkdebug("Field {$fieldnames[$i]} does not exist. Adding to create/alter table queue...");
             
             $ddl->addField($fieldnames[$i],
                             $types[$i],
@@ -777,7 +781,7 @@ use Sintattica\Atk\Core\Config;
       {
         if ($ddl->executeAlter())
         {
-          atkdebug("Table ".$node->m_table." altered...");
+          Tools::atkdebug("Table ".$node->m_table." altered...");
         }
       }
 
@@ -787,7 +791,7 @@ use Sintattica\Atk\Core\Config;
 
     function columnExists($table, $column,$type="")
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $meta = $db->metadata($table, true);
       for ($i=0, $_i=count($meta); $i<$_i; $i++)
       {
@@ -816,8 +820,8 @@ use Sintattica\Atk\Core\Config;
 
       if ($module!="" && $this->hasVersionInfo())
       {
-        $versioninfo = &atkGetNode("setup.versioninfo");
-        $recs = $versioninfo->selectDb("module='".$module."'");
+        $versioninfo = &Atk::GetInstance()->atkGetNode("Setup.Versioninfo");
+        $recs = $versioninfo->select("module='".$module."'");
 
         if (count($recs)>0)
         {
@@ -853,7 +857,7 @@ use Sintattica\Atk\Core\Config;
       $this->m_report[] = array("msg"=>$progressmsg, "type"=>$type);
       // Regardless of what we output later to the user, everything
       // reported by the scripts is put in the debuglog.
-      atkdebug($type.": ".$progressmsg);
+      Tools::atkdebug($type.": ".$progressmsg);
 
       // If an error is reported by some subprocess, we should
       // mark this so we don't continue.
@@ -865,7 +869,7 @@ use Sintattica\Atk\Core\Config;
     
     function executeSQL($sql)
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       return $db->query($sql);
     }
 
@@ -874,7 +878,7 @@ use Sintattica\Atk\Core\Config;
 
     function renameSequence($seq_name,$new_name)
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $sql = "UPDATE db_sequence SET seq_name='".$new_name."'
                 WHERE seq_name='".$seq_name."'";
       return $db->query($sql);
@@ -882,7 +886,7 @@ use Sintattica\Atk\Core\Config;
 
     function renameTable($old, $new)
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $sql = "ALTER TABLE $old RENAME $new";
       $res = $db->query($sql);
 
@@ -893,7 +897,7 @@ use Sintattica\Atk\Core\Config;
 
     function addColumn($table, $col, $type, $nullable=true, $default="")
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       if($this->columnExists($table,$col))
       {
         return $this->alterColumn($table,$col,$col,$type,$nullable,$default);
@@ -909,7 +913,7 @@ use Sintattica\Atk\Core\Config;
 
     function alterColumn($table, $col, $newname, $type, $nullable=true, $default="")
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $sql = "ALTER TABLE $table CHANGE $col $newname $type";
       if (!$nullable) $sql.=" NOT NULL";
       if ($default!="") $sql.= " DEFAULT '$default'";
@@ -920,7 +924,7 @@ use Sintattica\Atk\Core\Config;
     {
       if($this->columnExists($table,$col))
       {
-        $db = &atkGetDb();
+      	$db = &$this->getDb();
         $ddl = &$db->createDDL();
         $ddl->setTable($table);
         $ddl->dropField($col);
@@ -931,7 +935,7 @@ use Sintattica\Atk\Core\Config;
 
     function dropTable($table)
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       $ddl = &$db->createDDL();
       $ddl->setTable($table);
       return $ddl->executeDrop();
@@ -939,7 +943,7 @@ use Sintattica\Atk\Core\Config;
 
     function dropSequence($sequence)
     {
-      $db = &atkGetDb();
+      $db = &$this->getDb();
       // Only delete sequence with mysql, since postgress and oracle use their own sequences
       if (strpos($db->m_type, "mysql") === 0)
         return $db->query("DELETE FROM ".$db->m_seq_table." WHERE ".$db->m_seq_namefield." = '$sequence'");
@@ -954,7 +958,7 @@ use Sintattica\Atk\Core\Config;
       */
     function dropNode($node)
     {
-      $node = &atkGetNode($node);
+      $node = &Atk::GetInstance()->atkGetNode($node);
       $table = $node->m_table;
       $seq = $node->m_seq;
 
@@ -986,7 +990,7 @@ use Sintattica\Atk\Core\Config;
           // Like with install db, we pass the upgrade scripts a pointer
           // to $setup and $db.
           $setup = &$this;
-          $db = &atkGetDb();
+      		$db = &$this->getDb();
 
           // clear the report.
           $this->m_report = array();
@@ -1049,7 +1053,7 @@ use Sintattica\Atk\Core\Config;
 
     function renderResult($result)
     {
-      $table = &atknew("atk.utils.atktablerenderer");
+      $table = new TableRenderer();
 
       $data=array();
       if (count($result)>0)
@@ -1093,14 +1097,17 @@ use Sintattica\Atk\Core\Config;
 
     function upgradedb(&$result)
     {
-      global $g_modules;
+      //global $g_modules;
+      $g_modules = Atk::getInstance()->g_modules;
+
 
       $installedmodules = $this->getInstalledModules();
 
       $stufftodo = false;
 
       foreach ($g_modules as $modname=>$moduledir)
-      {
+			{
+				$moduledir = Atk::getInstance()->moduleDir($modname);;
         if (!in_array($modname, array_keys($installedmodules)) && $this->needsInstall($modname))
         {
           // module is not installed yet.
@@ -1108,7 +1115,7 @@ use Sintattica\Atk\Core\Config;
 
           if (!$this->installModule($modname, $result, true))
           {
-            atkdebug("Installation failed.");
+            Tools::atkdebug("Installation failed.");
             $this->m_cancontinue = false;
             break;
           }
@@ -1144,7 +1151,8 @@ use Sintattica\Atk\Core\Config;
 
               for($i=0, $_i=count($availablepatches); $i<$_i; $i++)
               {
-                $patchfile = moduleDir($modname)."install/patch-".$availablepatches[$i].".inc";
+								$mdir = Atk::getInstance()->moduleDir($modname);;
+                $patchfile = $mdir."install/patch-".$availablepatches[$i].".inc";
                 if ($this->includeInstallFile($modname, $patchfile))
                 {
                   $this->setVersion($availablepatches[$i]);
@@ -1165,7 +1173,8 @@ use Sintattica\Atk\Core\Config;
 
     function upgradeCheck()
     {
-      global $g_modules;
+      //global $g_modules;
+      $g_modules= Atk::getInstance()->g_modules;
 
       $installedmodules = $this->getInstalledModules();
 
@@ -1173,7 +1182,8 @@ use Sintattica\Atk\Core\Config;
       $patches = array();
 
       foreach ($g_modules as $modname=>$moduledir)
-      {
+			{
+				$moduledir = Atk::getInstance()->moduleDir($modname);;
         if (!in_array($modname, array_keys($installedmodules)) && $this->needsInstall($modname))
         {
           // module is not installed yet.
@@ -1210,7 +1220,7 @@ use Sintattica\Atk\Core\Config;
 
       if (count($installs)||count($patches))
       {
-        $table = atknew("atk.utils.atktablerenderer");
+        $table = new TableRenderer(); 
 
 
         // things must be installed or patched
@@ -1226,7 +1236,7 @@ use Sintattica\Atk\Core\Config;
           $data[] = array($modname, count($modpatches)." patch".(count($modpatches)>1?"es":""));
         }
 
-        $output = $table->render($data, TBL_HEADER, "recordlist");
+				$output = $table->render($data, TBL_HEADER, "recordlist");
 
         return $this->setupScreen("Database needs to be updated", "The following actions must be taken in order to update the Application database:<br><br>".$output."<br>Please click the 'continue' button below to start the update.", "upgradedb");
       }
@@ -1241,13 +1251,13 @@ use Sintattica\Atk\Core\Config;
      */
     function clearThemeCache()
     {
-      Tools::atkdebug("Clearing theme cache");
+      Tools::atkDebug("Clearing theme cache");
       // We don't use the themecompiler to recompile the theme, as that would
       // only compile the current theme. We need to recompile all themes, so
       // we just clear the compiled theme directory.
-      $dt =  new Atk\Core\Utils\DirectoryTraverser();
+      $dt =  new DirectoryTraverser();
       $dt->addCallBackObject($this);
-      $dt->traverse(Config::getGlobals("atktempdir", "atktmp")."themes/");
+      $dt->traverse(Config::getGlobal("atktempdir", "atktmp")."themes/");
     }
 
     function visitFile($file)

@@ -31,7 +31,7 @@ class DelApp extends AbstractCodeCreator
 		try{ 
 			FsManager::assertFileExists($this->full_basedir);
 		} catch(Exception $e){
-			throw new Exception($e->getMessage());
+			print($e->getMessage());
 		}
 		//if ($this->dbpass == null)
 		//	throw new Exception("This option requires a database user and password provide it with -u and -p. -u defaults to root");

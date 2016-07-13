@@ -1,11 +1,27 @@
-appnme:ctaspag
+appnme:${appnme}
+db:${dbnme}:${dbusr}:${dbpas}
 
-
-module:personas:Trabajar con Personas
-	node:Persona:Maestro de Personas
-		nombre
-		fecha_nacimiento
-		personas__tipos_de_personas_id
+	
+module:Security
+	node:Users
+		username
+		passwd
+		firstname
+		lastname
+		email
+		disabled::BoolAttribute
 		
-	node:tipos_de_personas:Tipos de personas
-		descripcion
+	node:Groups
+		name
+		description
+		users::ShuttleRelation:AF_HIDE_LIST|AF_HIDE_ADD,'Security.Users_Groups', 'Security.Users', 'group_id', 'user_id'
+		accessrights::ProfileAttribute:AF_BLANKLABEL|AF_HIDE_ADD
+		
+	node:Users_Groups:::::::true
+		user_id
+		group_id
+
+	node:AccessRights:::::::true
+		\node
+		action
+		group_id

@@ -1,0 +1,10 @@
+DB_NAME=${dbnme}
+DB_USER=${dbusr}
+DB_PASSWORD=${dbpas}
+DB_HOST=${dbhost}
+APPNME=${appnme}
+DEBUG_LEVEL=0
+
+# adminpwd
+ADMIN_PASSWORD="${appas}"
+META_CACHING=0

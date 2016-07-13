@@ -108,7 +108,7 @@ class RunGen extends AbstractCodeCreator
 			if ($node_def['install']==true)
 			{	
 				$node_name = $node_def['id'];				
-				$record['ndelst'].="\t\$setup->installNode(\"".$module_name.".".$node_name."_base\");\n";				
+				$record['ndelst'].="\t\$setup->installNode(\"".$module_name.".".$node_name."\");\n";				
 			}		
 		}
 		$record['vernbr']=trim($vs['version']);

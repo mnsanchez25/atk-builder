@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <command>
     <description>atk Framework code generator</description>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     
     <option name="verbose">
         <short_name>-v</short_name>
@@ -87,6 +87,12 @@
 	        <short_name>-p</short_name>
 	        <long_name>--db-passwd</long_name>
 	        <description>Database password.</description>	    
+        	<action>Password</action>
+        </option>
+        <option name="appass">
+	        <short_name>-a</short_name>
+	        <long_name>--app-passwd</long_name>
+	        <description>Application password (Defaults to demo).</description>	    
         	<action>Password</action>
         </option>
     </command>

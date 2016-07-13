@@ -137,10 +137,10 @@ class DataDictionary
 				$this->dd['modules'][$tags[TAMOD_ID]]['languages']=array();
 				$this->dd['modules'][$tags[TAMOD_ID]]['nodes']=array();
 				
-				$this->cur_mod=strtolower($tags[TAMOD_ID]);
+				$this->cur_mod=$tags[TAMOD_ID];
 				break;
 			case 'node':
-				$this->cur_nod=strtolower($tags[TANOD_ID]);
+				$this->cur_nod=$tags[TANOD_ID];
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]=array();	
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['id']=$this->cur_nod;							
 				$this->dd['modules'][$this->cur_mod]['nodes'][$this->cur_nod]['description']=trim($tags[TANOD_DESCRIPTION]==''?$tags[TA_ID]:$tags[TANOD_DESCRIPTION]);
@@ -162,6 +162,11 @@ class DataDictionary
 				$this->dd['roles'][$tags[TA_ID]]['description']=$tags[TA_DESCRIPTION];
 				break;
 			default: //atributos
+				if ($tags[TAATR_ID] == '\node') 
+				{
+								$tags[TAATR_ID] = 'node';
+				}
+
 				if ( ($this->cur_mod == NULL) or ($this->cur_nod == NULL))
 					$GLOBALS['syslog']->abort("attribute needs to be in a node inside a module:".$tags[TAATR_ID]);
 				$type= $tags[TAATR_TYPE];
