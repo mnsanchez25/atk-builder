@@ -16,6 +16,10 @@ class Module_base extends \Sintattica\Atk\Core\Module
     	${menu_items}
     }
     
+		public function register()
+		{
+		}
+
     public function search($expression)
     {
     	$results = array();

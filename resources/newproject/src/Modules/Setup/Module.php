@@ -9,6 +9,10 @@ class Module extends \Sintattica\Atk\Core\Module
 {
 	static $module = 'Setup';
 
+	public function register()
+	{
+	}
+
 	public function boot()
 	{
 		$this->registerNode('Setup',Setup::class,['admin', 'add', 'edit', 'delete', 'view']);
