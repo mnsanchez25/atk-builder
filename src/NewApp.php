@@ -54,7 +54,7 @@ class NewApp extends AbstractCodeCreator
 		echo "\n";
 		echo "App creation completed\n";
 		echo "First: Update dependicies with:\n";
-		echo "./composer update:\n";
+		echo "php ./composer update:\n";
 		echo "then check your app with:\n\n";
 		echo "cd ".$this->full_basedir."\n";
 		echo "php -S localhost:8080 -t web\n\n";
@@ -151,7 +151,11 @@ class NewApp extends AbstractCodeCreator
 		$source=$GLOBALS['syscfg']->cpbdir.DIRECTORY_SEPARATOR."resources".DIRECTORY_SEPARATOR;
 		$from=$source.'newproject';
 		$to= $this->full_basedir;
-		FsManager::copy($from,$to);
+		FsManager::copyr($from,$to);
+		//Create symbolic link into web/bundles to atk -> ../../vendor/sintattica/atk/src/Resources/public
+		$from = '../..//vendor/sintattica/atk/src/Resources/public';
+		$to = $this->full_basedir.'/web/bundles/atk';
+		FsManager::symLink($from, $to);
 		$GLOBALS['syslog']->finish();
 	}	
 	
@@ -159,7 +163,7 @@ class NewApp extends AbstractCodeCreator
 	{
 		$GLOBALS['syslog']->enter();
 		//chdir($this->full_basedir);
-		exec("./composer update");
+		exec("php ./composer update");
 		$GLOBALS['syslog']->finish();
 	}
 }

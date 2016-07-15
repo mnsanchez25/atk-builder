@@ -2,6 +2,7 @@
 namespace atkbuilder;
 
 use PEAR2\Console\CommandLine\Exception;
+use Phar;
 
 class FsManager
 {
@@ -49,7 +50,14 @@ class FsManager
 		if (!file_exists($file))
 			throw new Exception("File or directory does not exists:".$file);
 	}
-	
+
+	public static function symLink($from, $to)
+	{
+		$from = FsManager::normalizePath($from);
+		$to = FsManager::normalizePath($to);
+		symlink($from, $to);
+	}
+
 	public static function normalizePath($path)
 	{
 		$path=str_replace("/",  DIRECTORY_SEPARATOR, $path);
@@ -68,7 +76,46 @@ class FsManager
 		$GLOBALS['syslog']->debug($copy,2);
 		system($copy);
 	}
-	
+
+	public static function copyr($source, $dest)
+	{
+		// Check for symlinks
+		if (is_link($source)) 
+		{
+			return symlink(readlink($source), $dest);
+		}	
+
+		// Simple copy for a file
+		if (is_file($source)) 
+		{
+			return copy($source, $dest);
+		}
+
+		// Make destination directory
+		if (!is_dir($dest)) 
+		{
+			mkdir($dest);
+		}
+
+		// Loop through the folder
+		$dir = dir($source);
+		while (false !== $entry = $dir->read()) 
+		{
+			// Skip pointers
+			if ($entry == '.' || $entry == '..') 
+			{
+				continue;
+			}
+
+			// Deep copy directories
+			FsManager::copyr("$source/$entry", "$dest/$entry");
+		}
+
+		// Clean up
+		$dir->close();
+		return true;
+	}
+
 	public static function chmod($from, $auth)
 	{
 		/*
@@ -107,13 +154,36 @@ class FsManager
 		}
 		chmod($file,0774);
 	}
-	
+
+
 	public static function fileGetContents($file)
 	{
-		$file = FsManager::normalizePath($file);
-		return file_get_contents($file);
+		//$file = FsManager::normalizePath($file);
+		$GLOBALS['syslog']->debug("Getting contents of file:".$file,3);
+		///DIRTY CODE I don't fully understand WHY file_get_contents doesn't read the file when 
+		//the path is passed. This "search" works but I DO NOT LIKE IT
+		$target_file=basename($file);
+		$GLOBALS['syslog']->debug("Target file:".$target_file,3);
+		$dirstr = dirname($file);
+		$GLOBALS['syslog']->debug("Dir str:".$dirstr,3);
+		$dir = dir($dirstr);
+		$contents = "";
+		$contexto = stream_context_create(array('phar' =>
+																	array('metadata' => array('user' => 'cellog')
+																)));
+		while (false !== $entry = $dir->read()) 
+		{
+			if ($entry == $target_file)
+			{
+				$fullname = 	$dirstr.DIRECTORY_SEPARATOR.$entry;
+				$GLOBALS['syslog']->debug("Fullname:".$fullname,3);
+				$contents = file_get_contents($fullname, false, $contexto);
+			}	
+
+		}
+		return $contents;
 	}
-	
+ 
 	public static function fileExists($file)
 	{
 		$file = FsManager::normalizePath($file);

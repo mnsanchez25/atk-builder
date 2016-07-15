@@ -21,7 +21,6 @@ $xmlfile = dirname(__FILE__) .
 
 $cmdLineParser = PEAR2\Console\CommandLine::fromXmlFile($xmlfile);
 
-
 try {
 	$cmdlne = $cmdLineParser->parse();
 }
@@ -32,7 +31,7 @@ catch (Exception $exc){
 
 $GLOBALS['syscfg'] = new Config($cmdlne);
 $GLOBALS['syslog'] = new SysLogger($cmdlne->options['verbose']);
-$GLOBALS['syscfg']->cpbdir=dirname(__FILE__).DIRECTORY_SEPARATOR."..";
+$GLOBALS['syscfg']->cpbdir=dirname(dirname(__FILE__));
 
 try {
 	$BuilderDirector = new BuilderDirector();

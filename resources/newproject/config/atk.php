@@ -13,7 +13,7 @@ return [
     'modules' => [
     ],
 
-    'language' => 'it',
+    'language' => 'en',
 
     'authentication' => 'db',
 

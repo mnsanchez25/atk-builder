@@ -16,14 +16,11 @@
 		}
 	],
 	"keywords" : [
-		"atk tool generator scaffolding"
+		"atk framework CASE tool"
 	],
 	"autoload" : {
 		"psr-4" : {
 			"atkbuilder\\" : "src"
 		}
-	},
-	"require-dev": {
-		"clue/phar-composer": "^1.0"
 	}
 }
