@@ -6,7 +6,7 @@
 atk-builder is a code generator tool for the ATK Framework (See https://github.com/Sintattica/atk ).
 It is said than a video is worth a thousand words, so here you have a (lousy) one ...
 
-[![Alt text for your video](http://img.youtube.com/vi/9N_qECiHCAg/0.jpg)](http://www.youtube.com/watch?v=9N_qECiHCAg)
+[![Click to see video](http://img.youtube.com/vi/9N_qECiHCAg/0.jpg)](http://www.youtube.com/watch?v=9N_qECiHCAg)
 
 ### Installing
 Grab the atk-builder.phar file from the releases pages and the make it executable.
