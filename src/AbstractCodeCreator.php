@@ -41,16 +41,16 @@ abstract class AbstractCodeCreator
 
 	protected function execSQL($query)
 	{
-		$conn = mysql_connect($this->dbhost, $this->dbuser,$this->dbpass);
+		$conn = mysqli_connect($this->dbhost, $this->dbuser,$this->dbpass);
 		if (!$conn)
 			throw new Exception("Could not connect to database server with the supplied parameters. (User:".$this->dbuser." ,Pass:".$this->dbpass.")");
 		
-		$result = mysql_query($query);
+		$result = mysqli_query($query);
 		$GLOBALS['syslog']->debug("ExecSql:".$query,1);
 		$row = null;
 		if ($result)
-			@$row = mysql_fetch_array($result);
-		mysql_close($conn);
+			@$row = mysqli_fetch_array($result);
+		mysqli_close($conn);
 		return $row;
 	}
 }
